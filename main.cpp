@@ -29,6 +29,7 @@ int main(int argc, char** argv)
 	gAppHasUsedCheatKeys = LawnHasUsedCheatKeys;
 	gExtractResourcesByName = Sexy::ExtractResourcesByName;
 	gLawnApp = new LawnApp();
+	gLawnApp->SetArgs(argc, argv);
 	gLawnApp->Init();
 	gLawnApp->Start();
 	gLawnApp->Shutdown();

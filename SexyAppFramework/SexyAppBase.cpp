@@ -298,6 +298,8 @@ SexyAppBase::SexyAppBase()
 	mSoftVSyncWait = true;
 	mUserChanged3DSetting = false;
 	mAutoEnable3D = false;
+	mArgc = 0;
+	mArgv = nullptr;
 	mTest3D = false;
 	mMinVidMemory3D = 6;
 	mRecommendedVidMemory3D = 14;
@@ -4806,25 +4808,31 @@ void SexyAppBase::SetDouble(const std::string& theId, double theValue)
 
 void SexyAppBase::DoParseCmdLine()
 {
-	/*
-	char* aCmdLine = GetCommandLineA();	
-	char* aCmdLinePtr = aCmdLine;
-	if (aCmdLinePtr[0] == '"')
+	if (mArgv != nullptr)
 	{
-		aCmdLinePtr = strchr(aCmdLinePtr + 1, '"');
-		if (aCmdLinePtr != NULL)
-			aCmdLinePtr++;
+		for (int i = 1; i < mArgc; i++)
+		{
+			std::string aCurParamName = mArgv[i];
+			std::string aCurParamValue;
+
+			size_t anEqualsPos = aCurParamName.find('=');
+			if (anEqualsPos != std::string::npos)
+			{
+				aCurParamValue = aCurParamName.substr(anEqualsPos + 1);
+				aCurParamName = aCurParamName.substr(0, anEqualsPos);
+			}
+
+			HandleCmdLineParam(aCurParamName, aCurParamValue);
+		}
 	}
-	
-	if (aCmdLinePtr != NULL)
-	{
-		aCmdLinePtr = strchr(aCmdLinePtr, ' ');
-		if (aCmdLinePtr != NULL)
-			ParseCmdLine(aCmdLinePtr+1);	
-	}
-	*/
 
 	mCmdLineParsed = true;
+}
+
+void SexyAppBase::SetArgs(int argc, char** argv)
+{
+	mArgc = argc;
+	mArgv = argv;
 }
 
 void SexyAppBase::ParseCmdLine(const std::string& theCmdLine)

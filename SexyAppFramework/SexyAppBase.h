@@ -156,6 +156,8 @@ public:
 	bool					mNoSoundNeeded;
 	bool					mWantFMod;
 	bool					mCmdLineParsed;
+	int						mArgc;
+	char**					mArgv;
 	bool					mSkipSignatureChecks;
 	bool					mStandardWordWrap;
 	bool					mbAllowExtendedChars;
@@ -417,6 +419,7 @@ public:
 	virtual void			Shutdown();	
 
 	virtual void			DoParseCmdLine();
+	void					SetArgs(int argc, char** argv);
 	virtual void			ParseCmdLine(const std::string& theCmdLine);
 	virtual void			HandleCmdLineParam(const std::string& theParamName, const std::string& theParamValue);
 	virtual void			HandleNotifyGameMessage(int theType); // for HWND_BROADCAST of mNotifyGameMessage (0-1000 are reserved for SexyAppBase for theType)
