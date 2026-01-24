@@ -182,7 +182,7 @@ void Music::MusicTitleScreenInit()
 //0x45A980
 void Music::MusicInit()
 {
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	int aNumLoadingTasks = mApp->mCompletedLoadingThreadTasks + GetNumLoadingTasks();
 #endif
 
@@ -194,7 +194,7 @@ void Music::MusicInit()
 	LoadSong(MusicFile::MUSIC_FILE_CREDITS_ZOMBIES_ON_YOUR_LAWN, "sounds/ZombiesOnYourLawn.ogg");
 	mApp->mCompletedLoadingThreadTasks += /*原版*/3500;///*内测版*/800;
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	if (mApp->mCompletedLoadingThreadTasks != aNumLoadingTasks)
 		TodTrace("Didn't calculate loading task count correctly!!!!");
 #endif

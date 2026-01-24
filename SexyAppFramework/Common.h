@@ -82,8 +82,47 @@ typedef struct _GUID {
 #undef max
 
 // Define unreachable()
-#ifdef MSVC
-#define unreachable std::unreachable
+#ifdef _MSC_VER
+#include <direct.h>
+#include <io.h>
+#define unreachable [](){ __assume(0); }
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
+#define getcwd _getcwd
+#define access _access
+#define F_OK 0
+
+inline int nanosleep(const struct timespec* ts, struct timespec* rem)
+{
+	// rem is not implemented
+	rem = nullptr;
+
+	HANDLE timer = CreateWaitableTimer(nullptr, TRUE, nullptr);
+	if (!timer)
+		return -1;
+
+	// SetWaitableTimer() defines interval in 100ns units.
+	// negative is to indicate relative time.
+	time_t sec = ts->tv_sec;
+	long nsec = ts->tv_nsec;
+	if (sec < 0 || (sec == 0 && nsec <= 0))
+	{
+		CloseHandle(timer);
+		return 0;
+	}
+
+	LARGE_INTEGER delay;
+	delay.QuadPart = -((LONGLONG)sec * 10000000LL + (LONGLONG)nsec / 100LL);
+	BOOL ok = SetWaitableTimer(timer, &delay, 0, nullptr, nullptr, FALSE) &&
+		WaitForSingleObject(timer, INFINITE) == WAIT_OBJECT_0;
+
+	CloseHandle(timer);
+
+	if (!ok)
+		return -1;
+
+	return 0;
+}
 #else
 #define unreachable __builtin_unreachable
 #endif

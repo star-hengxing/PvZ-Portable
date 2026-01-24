@@ -348,7 +348,7 @@ bool ChallengeScreen::ShowPageButtons()
 //0x42E710
 void ChallengeScreen::UpdateButtons()
 {
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	for (int aPage = 0; aPage < MAX_CHALLANGE_PAGES; aPage++)
 		mPageButton[aPage]->mVisible = true;
 #endif

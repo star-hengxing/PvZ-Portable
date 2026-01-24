@@ -10,7 +10,14 @@ if(USE_OGG_VORBIS)
                 find_package(Tremor QUIET)
                 message("Tremor: [${Tremor_FOUND}] ${Tremor_INCLUDE_DIRS} ${Tremor_LIBRARIES}")
             else()
-                find_package(Vorbis QUIET)
+                find_package(Vorbis CONFIG QUIET)
+                if(TARGET Vorbis::vorbisfile)
+                    set(Vorbis_FOUND 1)
+                    set(Vorbis_LIBRARIES Vorbis::vorbisfile Vorbis::vorbis)
+                    get_target_property(Vorbis_INCLUDE_DIRS Vorbis::vorbisfile INTERFACE_INCLUDE_DIRECTORIES)
+                else()
+                    find_package(Vorbis QUIET)
+                endif()
                 message("Vorbis: [${Vorbis_FOUND}] ${Vorbis_INCLUDE_DIRS} ${Vorbis_LIBRARIES}")
             endif()
 
@@ -97,13 +104,7 @@ if(USE_OGG_VORBIS)
         message("== using STB-Vorbis (BSD 3-Clause) ==")
     endif()
 
-    if(Vorbis_FOUND OR Tremor_FOUND)
-        list(APPEND SDLMixerX_SOURCES
-            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c
-            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
-        )
-        appendPcmFormats("OGG Vorbis")
-    else(USE_OGG_VORBIS_STB)
+    if(USE_OGG_VORBIS_STB)
         list(APPEND SDLMixerX_SOURCES
             ${CMAKE_CURRENT_LIST_DIR}/music_ogg_stb.c
             ${CMAKE_CURRENT_LIST_DIR}/stb_vorbis/stb_vorbis.h
@@ -115,6 +116,14 @@ if(USE_OGG_VORBIS)
             )
         endif()
         appendPcmFormats("OGG Voribs")
+    elseif(Vorbis_FOUND OR Tremor_FOUND)
+        list(APPEND SDLMixerX_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.c
+            ${CMAKE_CURRENT_LIST_DIR}/music_ogg.h
+        )
+        appendPcmFormats("OGG Vorbis")
+    else()
+        message("-- skipping OGG sources --")
     endif()
 
 endif()

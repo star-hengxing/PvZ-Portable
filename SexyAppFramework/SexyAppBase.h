@@ -126,7 +126,6 @@ enum
 };
 
 typedef std::map<HANDLE, int> HandleToIntMap;
-
 class SexyAppBase : public ButtonListener, public DialogListener
 {
 public:
@@ -171,7 +170,7 @@ public:
 	WidgetManager*			mWidgetManager;
 	DialogMap				mDialogMap;
 	DialogList				mDialogList;
-	void*					mPrimaryThreadId;
+	pthread_t				mPrimaryThreadId;
 	bool					mSEHOccured;
 	bool					mShutdown;
 	bool					mExitToTop;

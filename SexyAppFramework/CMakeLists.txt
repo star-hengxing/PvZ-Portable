@@ -243,7 +243,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ################################################################################
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Debug>:"
-        "_DEBUG;"
+        #"_PVZ_DEBUG;" # Now this macro is defined in the primary CMakeLists.txt
         #"_WINDOWS;"
         #"_VISUALC_;"
         #"_JPEGLIB_;"

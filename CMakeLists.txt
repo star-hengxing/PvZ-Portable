@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.5...4.0)
 project(pvz-portable LANGUAGES C CXX ASM)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if (CMAKE_GENERATOR MATCHES "Ninja")
+	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+endif()
 
 file(GLOB SOURCES
 	*.cpp
@@ -31,9 +34,12 @@ list(REMOVE_ITEM SOURCES
 set(NO_GLEW OFF CACHE BOOL "Disable GLEW")
 set(LOW_MEMORY OFF CACHE BOOL "Enable low memory mode")
 set(DOWNSCALE_COUNT 1 CACHE STRING "Image downscale count")
+set(OGG_LIBRARIES ogg)
+set(OPENMPT_LIBRARIES openmpt)
+set(MPG123_LIBRARIES mpg123)
 if(NINTENDO_SWITCH)
 	set(NO_GLEW ON)
-	set(VORBIS_LIBS vorbisfile vorbis)
+	set(VORBIS_LIBRARIES vorbisfile vorbis)
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/switch/graphics/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/switch/graphics/GLInterface.cpp
@@ -58,7 +64,18 @@ elseif(NINTENDO_3DS)
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/3ds
 	)
 else()
-	set(VORBIS_LIBS vorbisfile vorbis)
+	if(MSVC)
+		find_package(Vorbis CONFIG REQUIRED)
+		find_package(Ogg CONFIG REQUIRED)
+		find_package(libopenmpt CONFIG REQUIRED)
+		find_package(mpg123 CONFIG REQUIRED)
+		set(VORBIS_LIBRARIES Vorbis::vorbis Vorbis::vorbisfile)
+		set(OGG_LIBRARIES Ogg::ogg)
+		set(OPENMPT_LIBRARIES libopenmpt::libopenmpt)
+		set(MPG123_LIBRARIES MPG123::libmpg123)
+	else()
+		set(VORBIS_LIBRARIES vorbisfile vorbis)
+	endif()
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/pc/graphics/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/SexyAppFramework/platform/pc/graphics/GLInterface.cpp
@@ -69,9 +86,15 @@ else()
 	)
 endif()
 
-option(ENABLE_DEBUG "Define _DEBUG macro" ON)
-option(CONSOLE "Show console on Windows" ${ENABLE_DEBUG})
-option(DO_FIX_BUGS "Define DO_FIX_BUGS macro" ON)
+if(CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]$")
+	set(WIN_CONSOLE_DEFAULT ON)
+else()
+	set(WIN_CONSOLE_DEFAULT OFF)
+endif()
+
+option(PVZ_DEBUG "Enable _PVZ_DEBUG macro (cheats, hidden features, etc.)" ON)
+option(CONSOLE "Show console on Windows" ${WIN_CONSOLE_DEFAULT})
+option(DO_FIX_BUGS "Define DO_FIX_BUGS macro (Fix bugs in the original 1.0.0.1051 but not in the 1.2.0.1073 GOTY Edition)" ON)
 
 set(OpenGL_GL_PREFERENCE GLVND)
 
@@ -82,6 +105,10 @@ find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 if (NOT NO_GLEW)
 	find_package(GLEW REQUIRED)
+endif()
+if(MSVC)
+	find_package(PThreads4W CONFIG REQUIRED)
+	find_path(DIRENT_INCLUDE_DIRS "dirent.h" REQUIRED)
 endif()
 
 set(SDL_MIXER_X_STATIC ON CACHE BOOL "Build static library of SDL Mixer X")
@@ -101,22 +128,26 @@ target_include_directories(pvz-portable PRIVATE
 	${SDL2_INCLUDE_DIRS}
 	${PLAT_INCLUDES}
 )
+if(MSVC)
+	target_include_directories(pvz-portable PRIVATE ${DIRENT_INCLUDE_DIRS})
+endif()
 target_compile_definitions(pvz-portable PRIVATE
-	$<$<BOOL:${ENABLE_DEBUG}>:_DEBUG>
+	$<$<BOOL:${PVZ_DEBUG}>:_PVZ_DEBUG>
 	$<$<BOOL:${DO_FIX_BUGS}>:DO_FIX_BUGS>
 )
+target_compile_features(pvz-portable PRIVATE cxx_std_20)
 
 if (LOW_MEMORY)
 	target_compile_definitions(pvz-portable PRIVATE LOW_MEMORY)
 endif()
 target_compile_definitions(pvz-portable PRIVATE IMG_DOWNSCALE=${DOWNSCALE_COUNT})
 
-target_link_libraries(pvz-portable 
+target_link_libraries(pvz-portable PRIVATE
 	SDL2_mixer_ext_Static 
-	openmpt 
-	mpg123 
-	${VORBIS_LIBS} 
-	ogg 
+	${OPENMPT_LIBRARIES} 
+	${MPG123_LIBRARIES} 
+	${VORBIS_LIBRARIES} 
+	${OGG_LIBRARIES} 
 	${PNG_LIBRARIES} 
 	${JPEG_LIBRARIES} 
 	${ZLIB_LIBRARIES} 
@@ -127,11 +158,12 @@ target_link_libraries(pvz-portable
 if (WIN32)
 	if(MSVC)
 		target_compile_options(pvz-portable PRIVATE /utf-8)
+		target_link_libraries(pvz-portable PRIVATE PThreads4W::PThreads4W)
 	else()
 		target_link_options(pvz-portable PRIVATE -static -static-libgcc -static-libstdc++)
 	endif()
 	
-	target_link_libraries(pvz-portable OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
+	target_link_libraries(pvz-portable PRIVATE OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
 	target_compile_definitions(pvz-portable PRIVATE WINDOWS)
 
 	if(NOT CONSOLE)
@@ -142,7 +174,7 @@ if (WIN32)
 		endif()
 	endif()
 elseif (NINTENDO_SWITCH)
-	target_link_libraries(pvz-portable glad EGL glapi drm_nouveau)
+	target_link_libraries(pvz-portable PRIVATE glad EGL glapi drm_nouveau)
 
 	nx_generate_nacp(pvz-portable.nacp
 		NAME "Plants vs. Zombies"
@@ -155,7 +187,7 @@ elseif (NINTENDO_SWITCH)
 		ICON ${CMAKE_CURRENT_SOURCE_DIR}/icon-switch.jpg
 	)
 elseif (NINTENDO_3DS)
-	target_link_libraries(pvz-portable citro3d shaders)
+	target_link_libraries(pvz-portable PRIVATE citro3d shaders)
 
 	ctr_generate_smdh(pvz-portable.smdh
 		NAME "Plants vs. Zombies"
@@ -169,5 +201,5 @@ elseif (NINTENDO_3DS)
 		SMDH pvz-portable.smdh
 	)
 else()
-	target_link_libraries(pvz-portable GL)
+	target_link_libraries(pvz-portable PRIVATE GL)
 endif()
