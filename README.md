@@ -108,13 +108,26 @@ You can customize the game features by adding options to the first `cmake` comma
 | Option | Default | Description |
 | :--- | :--- | :--- |
 | `PVZ_DEBUG` | `ON` | Enable cheat keys, beta features, and debug displays. Can be used in any build type no matter debug or release. |
-| `DO_FIX_BUGS` | `OFF` | Apply community fixes for original game bugs of 1.2.0.1073 GOTY Edition. |
-| `CONSOLE` | `OFF`* | Show a console window (Windows only). *Defaults to `ON` if build type is Debug. |
+| `DO_FIX_BUGS` | `OFF` | Apply community fixes for "bugs" of official 1.2.0.1073 GOTY Edition.[^1] These "bugs" usually be ***considered as "features"*** by many players, though. |
+| `CONSOLE` | `OFF`* | Show a console window (Windows only). *Defaults to `ON` if build type is `Debug`. (Don't be confused with `PVZ_DEBUG`.) |
 
-Example: Disable debug features and console window in a Release build
+[^1]: Current `DO_FIX_BUGS` includes the following fixes:
+    - Fix bungee zombie duplicate sun/item drop in I, Zombie mode.
+    - Mind-controlled Gargantuars smash enemy zombies instead of plants.
+    - Mind-controlled Gargantuars throw mind-controlled Imps (with scale, health, and direction fixes).
+    - Mind-controlled Gargantuars can smash vases in Scary Potter mode.
+    - Mind-controlled Pea/Gatling Head zombies shoot forward instead of backward.
+    - Mind-controlled Jalapeno/Squash zombies damage enemy zombies instead of plants.
+    - Coordinate fixes for mind-controlled Squash zombies tracking and smashing enemy zombies.
+    - Jalapeno zombies correctly clear Dr. Zomboss' skills (Iceball/Fireball) and ladder logic.
+    - Sync Dancer Zombie animations (fixes "Maid" displacement bug).
+    - Fix visual glitch of Ladder Zombie's arm recovery.
+    - Fix Dr. Zomboss' attack (RV, Fireball/Iceball) and summon range coverage for 6-lane (Pool) levels.
+
+Example: Enable `DO_FIX_BUGS` in Release build
 
 ```bash
-cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF
+cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DDO_FIX_BUGS=ON
 ```
 
 If running these commands does not create a successful build please create an issue and detail your problem.
