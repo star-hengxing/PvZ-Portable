@@ -121,12 +121,13 @@ Image* GetPNGImage(const std::string& theFileName)
 	png_set_bgr(png_ptr);
 
 //	int aNumBytes = png_get_rowbytes(png_ptr, info_ptr) * height / 4;
-    png_bytep row_pointers[height];
+	png_bytep* row_pointers = new png_bytep[height];
 	uint32_t* aBits = new uint32_t[width*height];
-    for (uint i = 0; i < height; i++) {
-        row_pointers[i] = (png_bytep)(aBits + i*width);
-    }
-    png_read_image(png_ptr, row_pointers);
+	for (uint i = 0; i < height; i++)
+	{
+		row_pointers[i] = (png_bytep)(aBits + i*width);
+	}
+	png_read_image(png_ptr, row_pointers);
     /*
 	unsigned long* anAddr = aBits;
 	for (unsigned int i = 0; i < height; i++)
@@ -143,6 +144,7 @@ Image* GetPNGImage(const std::string& theFileName)
 
 	/* close the file */
 	p_fclose(fp);
+	delete[] row_pointers;
 
 	Image* anImage = new Image();
 	anImage->mWidth = width;

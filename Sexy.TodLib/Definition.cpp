@@ -1334,7 +1334,7 @@ bool DefinitionCompileFile(const SexyString theXMLFilePath, const SexyString& th
 //0x4447F0 : (void* def, *defMap, string& xmlFilePath)  //esp -= 0xC
 bool DefinitionCompileAndLoad(const SexyString& theXMLFilePath, DefMap* theDefMap, void* theDefinition)
 {
-#ifdef _DEBUG  // 内测版执行的内容
+#ifdef _PVZ_DEBUG  // 内测版执行的内容
 
     TodHesitationTrace(__S("predef"));
     SexyString aCompiledFilePath = DefinitionGetCompiledFilePathFromXMLFilePath(theXMLFilePath);

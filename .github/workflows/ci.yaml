@@ -12,7 +12,60 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-windows:
+  build-archlinux:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install Base Dependencies
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm \
+          base-devel \
+          cmake \
+          glew \
+          libjpeg-turbo \
+          libogg \
+          libopenmpt \
+          libpng \
+          libvorbis \
+          mpg123 \
+          ninja \
+          sdl2-compat \
+          sudo
+
+    - name: Create Builder User
+      run: |
+        useradd -m builder
+        echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+        chmod 0440 /etc/sudoers.d/builder
+
+    - name: Fix Directory Permissions
+      run: |
+        chown -R builder:builder .
+
+    - name: Build PvZ-Portable
+      run: |
+        sudo -u builder bash -lc '
+          mkdir build
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+
+          mkdir -p dist
+          cp build/pvz-portable dist/
+          strip dist/pvz-portable
+        '
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pvz-portable-archlinux
+        path: dist/
+
+  build-windows-msys2-ucrt64:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
@@ -66,56 +119,52 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: pvz-portable-windows
+        name: pvz-portable-windows-msys2-ucrt64
         path: dist/
 
-  build-archlinux:
-    runs-on: ubuntu-latest
-    container: archlinux:latest
+  build-windows-msvc:
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Install Base Dependencies
-      run: |
-        pacman -Syu --noconfirm
-        pacman -S --noconfirm \
-          base-devel \
-          cmake \
-          glew \
-          libjpeg-turbo \
-          libogg \
-          libopenmpt \
-          libpng \
-          libvorbis \
-          mpg123 \
-          ninja \
-          sdl2-compat \
-          sudo
+    - uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Create Builder User
-      run: |
-        useradd -m builder
-        echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
-        chmod 0440 /etc/sudoers.d/builder
+    - name: Install Ninja
+      run: choco install ninja -y
 
-    - name: Fix Directory Permissions
-      run: |
-        chown -R builder:builder .
+    - name: Setup vcpkg (manifest mode)
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgJsonGlob: vcpkg.json
 
-    - name: Build PvZ-Portable
+    - name: Compile PvZ-Portable for Windows (MSVC)
+      shell: pwsh
       run: |
-        sudo -u builder mkdir build
-        sudo -u builder cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release
-        sudo -u builder cmake --build build
-        
-        sudo -u builder mkdir -p dist
-        sudo -u builder cp build/pvz-portable dist/
-        sudo -u builder strip dist/pvz-portable
+        cmake -G "Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
+        cmake --build build
+
+        New-Item -ItemType Directory -Force -Path dist | Out-Null
+        Copy-Item build/pvz-portable.exe dist/
+
+        $exe = Resolve-Path build/pvz-portable.exe
+        $vcpkgBin = Join-Path $PWD "vcpkg_installed/x64-windows/bin"
+        $deps = & dumpbin /DEPENDENTS $exe | Select-String -Pattern "\.dll" | ForEach-Object {
+          $_.ToString().Trim()
+        } | Sort-Object -Unique
+
+        foreach ($dll in $deps) {
+          $candidate = Join-Path $vcpkgBin $dll
+          if (Test-Path $candidate) {
+            Copy-Item $candidate dist/ -Force
+          }
+        }
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: pvz-portable-archlinux
+        name: pvz-portable-windows-msvc
         path: dist/
 
   build-switch:
@@ -124,6 +173,8 @@ jobs:
       image: devkitpro/devkita64:latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Compile libopenmpt for Switch
         shell: bash

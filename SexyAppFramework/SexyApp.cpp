@@ -4,7 +4,9 @@
 //#include "misc/SEHCatcher.h"
 //#include "InternetManager.h"
 #include <time.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include <fstream>
 //#include "BetaSupport.h"
@@ -428,7 +430,7 @@ bool SexyApp::OpenRegisterPage()
 /*
 bool SexyApp::CheckSignature(const Buffer& theBuffer, const std::string& theFileName)
 {
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	// Don't check signatures on debug version because it's annoying and the build number
 	//  will probably be 0 anyway
 	return true;

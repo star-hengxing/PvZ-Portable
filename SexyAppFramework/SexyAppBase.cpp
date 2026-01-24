@@ -4,7 +4,9 @@
 
 #include <string>
 #include <fstream>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <time.h>
 #include <math.h>
 
@@ -161,7 +163,7 @@ SexyAppBase::SexyAppBase()
 	//mMutex = NULL;
 	mNotifyGameMessage = 0;
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	mOnlyAllowOneCopyToRun = false;
 #else
 	mOnlyAllowOneCopyToRun = true;
@@ -363,7 +365,7 @@ SexyAppBase::SexyAppBase()
 	mWidgetManager = new WidgetManager(this);
 	mResourceManager = new ResourceManager(this);
 
-	mPrimaryThreadId = 0;
+	mPrimaryThreadId = pthread_self();
 
 	/*
 	if (GetSystemMetrics(86)) // check for tablet pc
@@ -2237,7 +2239,11 @@ std::string SexyAppBase::GetGameSEHInfo()
 	sprintf(aTimeStr, "%02d:%02d:%02d", (aSecLoaded/60/60), (aSecLoaded/60)%60, aSecLoaded%60);
 	
 	char aThreadIdStr[16];
-	sprintf(aThreadIdStr, "%lX", mPrimaryThreadId);
+#ifdef _MSC_VER
+	sprintf(aThreadIdStr, "n/a");
+#else
+	sprintf(aThreadIdStr, "%lX", (unsigned long)mPrimaryThreadId);
+#endif
 
 	std::string anInfoString = 
 		"Product: " + mProdName + "\r\n" +		
@@ -2260,7 +2266,7 @@ void SexyAppBase::ShutdownHook()
 
 void SexyAppBase::Shutdown()
 {
-	if ((mPrimaryThreadId != 0) && ((void*)pthread_self() != mPrimaryThreadId))
+	if (!pthread_equal(pthread_self(), mPrimaryThreadId))
 	{
 		mLoadingFailed = true;
 	}
@@ -2787,7 +2793,7 @@ bool SexyAppBase::DrawDirtyStuff()
 
 		mScreenBltTime = aEndTime - aPreScreenBltTime;
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 		/*if (mFPSTime >= 5000) // Show FPS about every 5 seconds
 		{
 			uint32_t aTickNow = GetTickCount();
@@ -3421,7 +3427,7 @@ void SexyAppBase::ClearKeysDown()
 void SexyAppBase::WriteDemoTimingBlock()
 {
 	// Demo writing functions can only be called from the main thread and after SexyAppBase::Init
-	DBG_ASSERTE((void*)pthread_self() == mPrimaryThreadId);
+	DBG_ASSERTE(pthread_equal(pthread_self(), mPrimaryThreadId));
 
 	while (mUpdateCount - mLastDemoUpdateCnt > 15)
 	{
@@ -5025,7 +5031,7 @@ void SexyAppBase::InitHook()
 
 void SexyAppBase::Init()
 {
-	mPrimaryThreadId = (void*)pthread_self();	
+	mPrimaryThreadId = pthread_self();	
 	
 	if (mShutdown)
 		return;

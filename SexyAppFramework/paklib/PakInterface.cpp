@@ -1,4 +1,6 @@
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include "Common.h"
 #include "PakInterface.h"
 #include "fcaseopen/fcaseopen.h"

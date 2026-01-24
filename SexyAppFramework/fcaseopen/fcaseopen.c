@@ -1,15 +1,15 @@
 #include "fcaseopen.h"
 
+#if defined(_WIN32)
+#include <direct.h> // chdir on Windows
+#else
 #include <unistd.h> // fix "implicit declaration of function chdir"
-
-#if !defined(_WIN32)
 #include <stdlib.h>
 #include <string.h>
 
 #include <dirent.h>
 #include <errno.h>
-
-
+#endif
 #ifdef __HAIKU__
 // this function seems to not exist under haiku??
 char *strsep(char **stringp, const char *delim)
@@ -38,7 +38,7 @@ char *strsep(char **stringp, const char *delim)
 }
 #endif
 
-
+#if !defined(_WIN32)
 // r must have strlen(path) + 3 bytes
 static int casepath(char const *path, char *r)
 {

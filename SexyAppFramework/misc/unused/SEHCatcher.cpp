@@ -1192,7 +1192,7 @@ void SEHCatcher::ShowErrorDialog(const std::string& theErrorTitle, const std::st
 	if (mApp == NULL)
 		aWindowStyle |= WS_DISABLED;
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	bool doDebugButton = true;
 #else
 	bool doDebugButton = false;

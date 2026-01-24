@@ -117,7 +117,7 @@ LawnApp::LawnApp()
 	mProdName = "PopCap/PlantsVsZombies";
 	std::string aTitleName = "Plants vs. Zombies";
 /*
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	aTitleName += " BETA ";
 	aTitleName += mProductVersion;
 #endif
@@ -247,7 +247,7 @@ LawnApp::~LawnApp()
 
 	mResourceManager->DeleteResources("");
 	/*
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	BetaSubmit(true);
 #endif
 	*/
@@ -331,7 +331,7 @@ void LawnApp::KillBoard()
 	if (mBoard)
 	{
 /*
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 		BetaRecordLevelStats();
 #endif
 */
@@ -1270,7 +1270,7 @@ void LawnApp::Init()
 
 	SexyApp::Init();
 	// @Patoke: horrible debug checks, breaks the whole exe in release mode
-//#ifdef _DEBUG
+//#ifdef _PVZ_DEBUG
 	TodAssertInitForApp();
 	TodLog("session id: %u", mSessionID);
 //#endif
@@ -1310,7 +1310,7 @@ void LawnApp::Init()
 	mWidgetManager->AddWidget(mTitleScreen);
 	mWidgetManager->SetFocus(mTitleScreen);
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	int aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'profiles' %d ms", aDuration);
 #endif
@@ -1342,7 +1342,7 @@ void LawnApp::Init()
 	mDaisyCheck = new TypingCheck("daisies");
 	mSukhbirCheck = new TypingCheck("sukhbir");
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'system' %d ms", aDuration);
 #endif
@@ -1352,7 +1352,7 @@ void LawnApp::Init()
 	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_LOADBAR_SPROUT, true);
 	ReanimatorEnsureDefinitionLoaded(ReanimationType::REANIM_LOADBAR_ZOMBIEHEAD, true);
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	aDuration = mTimer.GetDuration();
 	TodTrace("loading: 'loaderbar' %d ms", aDuration);
 #endif
@@ -1385,7 +1385,7 @@ void LawnApp::HandleCmdLineParam(const std::string& theParamName, const std::str
 {
 	if (theParamName == "-tod")
 	{
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 		mTodCheatKeys = true;
 		mDebugKeysEnabled = true;
 #endif
@@ -1651,7 +1651,7 @@ void LawnApp::UpdateFrames()
 		mBoard->ResetFPSStats();
 	}
 
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	UpdatePlayTimeStats();
 #endif
 
@@ -3384,7 +3384,7 @@ bool LawnApp::IsTrialStageLocked()
 //0x455CC0
 void LawnApp::InitHook()
 {
-#ifdef _DEBUG
+#ifdef _PVZ_DEBUG
 	mDRM = nullptr;
 #else
 	mDRM = new PopDRMComm();
