@@ -62,6 +62,32 @@ Examples:
 
 If you prefer to keep everything in the same folder as the executable, you can still configure a custom data directory via the `-changedir` command-line parameter when launching the game.
 
+## Dependencies
+
+Before building on PC, ensure you have the necessary dependencies installed:
+
+- **Build Tools**: `CMake`, `Ninja`, A C/C++ compiler (e.g., `gcc`, `clang`, `MSVC`)
+- **Graphics**: `GLEW`, `OpenGL`
+- **Audio**: `libopenmpt`, `libogg`, `libvorbis`, `mpg123`
+- **Image**: `libpng`, `libjpeg-turbo`
+- **Windowing/Input**: `SDL2`
+
+### Arch Linux
+
+You can install the required dependencies using the following command:
+
+```bash
+sudo pacman -S --needed base-devel cmake glew libjpeg-turbo libogg libopenmpt libpng libvorbis mpg123 ninja sdl2-compat
+```
+
+### MSYS2 (UCRT64)
+
+You can install the required dependencies using the following command:
+
+```bash
+pacman -S --needed base-devel mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-glew mingw-w64-ucrt-x86_64-libjpeg-turbo mingw-w64-ucrt-x86_64-libopenmpt mingw-w64-ucrt-x86_64-libogg mingw-w64-ucrt-x86_64-libpng mingw-w64-ucrt-x86_64-libvorbis mingw-w64-ucrt-x86_64-mpg123 mingw-w64-ucrt-x86_64-ninja mingw-w64-ucrt-x86_64-SDL2
+```
+
 ## Build Instructions
 
 Run the following commands (assuming you have CMake and other dependencies installed) where the `CMakeLists.txt` file is located:
