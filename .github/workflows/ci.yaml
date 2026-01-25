@@ -138,28 +138,16 @@ jobs:
       uses: lukka/run-vcpkg@v11
       with:
         vcpkgJsonGlob: vcpkg.json
+        vcpkgTriplet: x64-windows-static
 
     - name: Compile PvZ-Portable for Windows (MSVC)
       shell: pwsh
       run: |
-        cmake -G "Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
+        cmake -G "Ninja" -B build -DCMAKE_BUILD_TYPE=Release -DCONSOLE=OFF -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows-static
         cmake --build build
 
         New-Item -ItemType Directory -Force -Path dist | Out-Null
         Copy-Item build/pvz-portable.exe dist/
-
-        $exe = Resolve-Path build/pvz-portable.exe
-        $vcpkgBin = Join-Path $PWD "vcpkg_installed/x64-windows/bin"
-        $deps = & dumpbin /DEPENDENTS $exe | Select-String -Pattern "\.dll" | ForEach-Object {
-          $_.ToString().Trim()
-        } | Sort-Object -Unique
-
-        foreach ($dll in $deps) {
-          $candidate = Join-Path $vcpkgBin $dll
-          if (Test-Path $candidate) {
-            Copy-Item $candidate dist/ -Force
-          }
-        }
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
