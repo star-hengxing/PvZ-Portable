@@ -961,7 +961,7 @@ void Zombie::LoadPlainZombieReanim()
         EnableFuture(mBoard->mFutureMode);
     }
 
-    if ((mBoard && mBoard->mPlantRow[mRow] == PlantRowType::PLANTROW_POOL) || mZombieType == ZombieType::ZOMBIE_DUCKY_TUBE)
+    if ((mBoard && mBoard->mPlantRow[mRow] == PlantRowType::PLANTROW_POOL && mFromWave != Zombie::ZOMBIE_WAVE_CUTSCENE) || mZombieType == ZombieType::ZOMBIE_DUCKY_TUBE)
     {
         ReanimShowPrefix("zombie_duckytube", RENDER_GROUP_NORMAL);
         ReanimIgnoreClipRect("Zombie_duckytube", true);
