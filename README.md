@@ -6,7 +6,7 @@ A **cross-platform** community-driven reimplementation of Plants vs. Zombies: Ga
 
 | 🌿 Authentic | 🎮 Portable | 🛠️ Open |
 | :---: | :---: | :---: |
-| Almost 100% gameplay recreation | Run on Linux, Windows, macOS, Switch... | OpenGL & SDL |
+| Almost 100% gameplay recreation | Support for 32-bit and 64-bit systems<br>Run on Linux, Windows, macOS, Switch... | OpenGL & SDL |
 
 ## License
 
@@ -182,7 +182,7 @@ The framework differs from many other APIs in that some class properties are not
 
 ## Thanks
 
-- **[@Headshotnoby](https://www.github.com/headshot2017)**: For fully implementing the 64-bit support and OpenGL backend.
+- **[@Headshotnoby](https://www.github.com/headshot2017)**: For almost fully implementing the 64-bit support and OpenGL backend.
 - **[@Patoke](https://www.github.com/Patoke)**: For the incredible initial reimplementation of PvZ GOTY.
 - **[@rspforhp](https://www.github.com/octokatherine)**: For the 0.9.9 version's work.
 - **[@ruslan831](https://github.com/ruslan831)**: For archiving the 0.9.9 version's re-implementation.
