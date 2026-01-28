@@ -85,6 +85,14 @@ You can install the required dependencies using the following command:
 sudo pacman -S --needed base-devel cmake glew libjpeg-turbo libogg libopenmpt libpng libvorbis mpg123 ninja sdl2-compat
 ```
 
+### Debian/Ubuntu
+
+You can install the required dependencies using the following command:
+
+```bash
+sudo apt install cmake ninja-build libogg-dev libglew-dev libjpeg-dev libopenmpt-dev libpng-dev libvorbis-dev libmpg123-dev libsdl2-dev
+```
+
 ### Windows (MSYS2 UCRT64)
 
 You can install the required dependencies using the following command:
