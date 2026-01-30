@@ -424,6 +424,8 @@ void LawnApp::PreNewGame(GameMode theGameMode, bool theLookForSavedGame)
 
 	std::string aFileName = GetSavedGameName(mGameMode, mPlayerInfo->mId);
 	EraseFile(aFileName);
+	std::string aLegacyFileName = GetLegacySavedGameName(mGameMode, mPlayerInfo->mId);
+	EraseFile(aLegacyFileName);
 	NewGame();
 }
 

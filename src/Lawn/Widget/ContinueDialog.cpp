@@ -118,6 +118,8 @@ void ContinueDialog::ButtonDepress(int theId)
         {
             std::string aFileName = GetSavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
             mApp->EraseFile(aFileName);
+            std::string aLegacyFileName = GetLegacySavedGameName(mApp->mGameMode, mApp->mPlayerInfo->mId);
+            mApp->EraseFile(aLegacyFileName);
         }
 
         RestartLoopingSounds();
