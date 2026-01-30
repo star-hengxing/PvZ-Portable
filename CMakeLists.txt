@@ -195,8 +195,8 @@ elseif (NINTENDO_SWITCH)
 	target_link_libraries(pvz-portable PRIVATE glad EGL glapi drm_nouveau)
 
 	nx_generate_nacp(pvz-portable.nacp
-		NAME "Plants vs. Zombies"
-		AUTHOR "PopCap Games, unofficial Switch port by the community"
+		NAME "PvZ Portable"
+		AUTHOR "wszqkzqk, etc., a community-driven port"
 		VERSION "0.1"
 	)
 
@@ -208,9 +208,9 @@ elseif (NINTENDO_3DS)
 	target_link_libraries(pvz-portable PRIVATE citro3d shaders)
 
 	ctr_generate_smdh(pvz-portable.smdh
-		NAME "Plants vs. Zombies"
-		DESCRIPTION "GOTY Edition"
-		AUTHOR "PopCap Games, unofficial 3DS port by the community"
+		NAME "PvZ Portable"
+		DESCRIPTION "A community-driven re-implementation of Plants vs. Zombies GOTY Edition"
+		AUTHOR "wszqkzqk, etc., a community-driven port"
 		VERSION "0.1"
 		ICON "${CMAKE_CURRENT_SOURCE_DIR}/icon-3ds.png"
 	)

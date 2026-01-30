@@ -114,14 +114,8 @@ LawnApp::LawnApp()
 	mSfxVolume = 0.5525;
 	mAutoStartLoadingThread = false;
 	mDebugKeysEnabled = false;
-	mProdName = "PopCap/PlantsVsZombies";
-	std::string aTitleName = "Plants vs. Zombies";
-/*
-#ifdef _PVZ_DEBUG
-	aTitleName += " BETA ";
-	aTitleName += mProductVersion;
-#endif
-*/
+	mProdName = "io.github.wszqkzqk.pvz-portable";
+	std::string aTitleName = "PvZ Portable";
 	mTitle = StringToSexyStringFast(aTitleName);
 	mCustomCursorsEnabled = false;
 	mPlayerInfo = nullptr;
