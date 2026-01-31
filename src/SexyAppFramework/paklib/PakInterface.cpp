@@ -254,10 +254,9 @@ PFILE* PakInterface::FOpen(const char* theFileName, const char* anAccess)
 		}
 	}
 
-	const std::string aResourceBase = Sexy::GetResourceFolder();
-	std::filesystem::path aPath(theFileName);
+	const std::string& aResourceBase = Sexy::GetResourceFolder();
 	FILE* aFP = nullptr;
-	if (!aResourceBase.empty() && !aPath.is_absolute())
+	if (!aResourceBase.empty() && !std::filesystem::path(theFileName).is_absolute())
 	{
 		aFP = fcaseopenat(aResourceBase.c_str(), theFileName, anAccess);
 	}

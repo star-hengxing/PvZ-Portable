@@ -189,7 +189,7 @@ extern std::wstring	StrFormat(const wchar_t* fmt ...);
 std::string			GetAppDataFolder();
 void				SetAppDataFolder(const std::string& thePath);
 std::string			GetAppDataPath(const std::string& theRelativePath);
-std::string			GetResourceFolder();
+const std::string&	GetResourceFolder();
 void				SetResourceFolder(const std::string& thePath);
 std::string			GetResourcePath(const std::string& theRelativePath);
 std::string			URLEncode(const std::string& theString);

@@ -23,6 +23,7 @@ namespace Sexy
 {
 	std::filesystem::path gAppDataFolder;
 	std::filesystem::path gResourceFolder;
+	std::string gResourceFolderStr; // Cached string to avoid repeated conversions
 }
 
 void Sexy::PrintF(const char *text, ...)
@@ -76,14 +77,15 @@ std::string Sexy::GetAppDataPath(const std::string& theRelativePath)
 	return (Sexy::gAppDataFolder / theRelativePath).string();
 }
 
-std::string Sexy::GetResourceFolder()
+const std::string& Sexy::GetResourceFolder()
 {
-	return Sexy::gResourceFolder.string();
+	return Sexy::gResourceFolderStr;
 }
 
 void Sexy::SetResourceFolder(const std::string& thePath)
 {
 	Sexy::gResourceFolder = thePath;
+	Sexy::gResourceFolderStr = Sexy::gResourceFolder.string();
 }
 
 std::string Sexy::GetResourcePath(const std::string& theRelativePath)
