@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <filesystem>
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
@@ -29,7 +30,8 @@ bool Sexy::gDebug = false;
 static Sexy::MTRand gMTRand;
 namespace Sexy
 {
-	std::string gAppDataFolder = "";
+	std::filesystem::path gAppDataFolder;
+	std::filesystem::path gResourceFolder;
 }
 
 void Sexy::PrintF(const char *text, ...)
@@ -124,19 +126,32 @@ bool Sexy::CheckForVista()
 
 std::string Sexy::GetAppDataFolder()
 {
-	return Sexy::gAppDataFolder;
+	return Sexy::gAppDataFolder.string();
 }
 
 void Sexy::SetAppDataFolder(const std::string& thePath)
 {
-	std::string aPath = thePath;
-	if (!aPath.empty())
-	{
-		if (aPath[aPath.length()-1] != '\\' && aPath[aPath.length()-1] != '/')
-			aPath += '/';
-	}
+	Sexy::gAppDataFolder = thePath;
+}
 
-	Sexy::gAppDataFolder = aPath;
+std::string Sexy::GetAppDataPath(const std::string& theRelativePath)
+{
+	return (Sexy::gAppDataFolder / theRelativePath).string();
+}
+
+std::string Sexy::GetResourceFolder()
+{
+	return Sexy::gResourceFolder.string();
+}
+
+void Sexy::SetResourceFolder(const std::string& thePath)
+{
+	Sexy::gResourceFolder = thePath;
+}
+
+std::string Sexy::GetResourcePath(const std::string& theRelativePath)
+{
+	return (Sexy::gResourceFolder / theRelativePath).string();
 }
 
 

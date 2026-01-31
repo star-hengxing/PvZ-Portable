@@ -1,6 +1,7 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
+#include <filesystem>
 #include "Common.h"
 #include "PakInterface.h"
 #include "fcaseopen/fcaseopen.h"
@@ -253,7 +254,17 @@ PFILE* PakInterface::FOpen(const char* theFileName, const char* anAccess)
 		}
 	}
 
-	FILE* aFP = fcaseopen(theFileName, anAccess);
+	const std::string aResourceBase = Sexy::GetResourceFolder();
+	std::filesystem::path aPath(theFileName);
+	FILE* aFP = nullptr;
+	if (!aResourceBase.empty() && !aPath.is_absolute())
+	{
+		aFP = fcaseopenat(aResourceBase.c_str(), theFileName, anAccess);
+	}
+	else
+	{
+		aFP = fcaseopen(theFileName, anAccess);
+	}
 	if (aFP == nullptr)
 		return nullptr;
 	PFILE* aPFP = new PFILE;
