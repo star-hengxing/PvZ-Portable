@@ -176,9 +176,9 @@ SexyAppBase::SexyAppBase()
 	//mChangeDirTo = GetFileDir(aPath);
 
 #ifdef __SWITCH__
-	mChangeDirTo = "sdmc:/switch/PlantsvsZombies/";
+	mChangeDirTo = "sdmc:/switch/PvZPortable/";
 #elif defined(__3DS__)
-	mChangeDirTo = "sdmc:/3ds/PlantsvsZombies/";
+	mChangeDirTo = "sdmc:/3ds/PvZPortable/";
 #else
 	char* aBasePath = SDL_GetBasePath();
 	if (aBasePath)
@@ -5050,7 +5050,7 @@ void SexyAppBase::Init()
 	InitPropertiesHook();
 
 #if !defined(__SWITCH__) && !defined(__3DS__)
-	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PlantsVsZombies"); // Avoid conflict with official Plants vs. Zombies
+	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable"); // Avoid conflict with official Plants vs. Zombies
 	if (aPrefPath)
 	{
 		SetAppDataFolder(aPrefPath);

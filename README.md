@@ -47,8 +47,8 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
 | Windows (SDL2)  | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
 | macOS (SDL2)    | Executable dir (resources); per-user app-data for writable files | Works                                                                                  |
 | Haiku (SDL2)    | Executable dir (resources); per-user app-data for writable files | Partially works: no music                                                              |
-| Nintendo Switch | sdmc:/switch/PlantsvsZombies | Works on real hardware. Kenji-NX crashes on boot.                           |
-| Nintendo 3DS    | sdmc:/3ds/PlantsvsZombies    | In development, might not have enough memory for Old 3DS, might barely work on New 3DS |
+| Nintendo Switch | sdmc:/switch/PvZPortable | Works on real hardware. Kenji-NX crashes on boot.                           |
+| Nintendo 3DS    | sdmc:/3ds/PvZPortable    | In development, might not have enough memory for Old 3DS, might barely work on New 3DS |
 | Nintendo Wii U  |                              | No work started yet, but planned                                                       |
 
 To play the game, you need the game data from PvZ GOTY. Place `main.pak` and the `properties/` folder next to the `pvz-portable` executable (the game will search for resources relative to the executable's directory). You can also use extracted data instead of `main.pak` if you prefer.
@@ -56,7 +56,7 @@ To play the game, you need the game data from PvZ GOTY. Place `main.pak` and the
 Note about writable data and caches:
 
 - The game will read resources (like `main.pak` and `properties/`) from the executable directory by default, so you can launch the binary from any working directory and it will still find them.
-- Per-user writable files (settings, savegames, compiled caches, screenshots) are stored in the **OS-recommended application data path**. With the current build these are under `io.github.wszqkzqk/PlantsVsZombies` and include subfolders such as:
+- Per-user writable files (settings, savegames, compiled caches, screenshots) are stored in the **OS-recommended application data path**. With the current build these are under `io.github.wszqkzqk/PvZPortable` and include subfolders such as:
   - `userdata/` — player save files
   - `cache64/` if you use the 64-bit version or `cache32/` if you use the 32-bit version — compiled binary caches (reanimation / compiled definitions)
   - `registry.regemu` — settings/registry emulation
@@ -65,9 +65,9 @@ Note about writable data and caches:
 
 Examples:
 
-- Linux: `~/.local/share/io.github.wszqkzqk/PlantsVsZombies/`
-- Windows: `%APPDATA%\io.github.wszqkzqk\PlantsVsZombies\`
-- macOS: `~/Library/Application Support/io.github.wszqkzqk/PlantsVsZombies/`
+- Linux: `~/.local/share/io.github.wszqkzqk/PvZPortable/`
+- Windows: `%APPDATA%\io.github.wszqkzqk\PvZPortable\`
+- macOS: `~/Library/Application Support/io.github.wszqkzqk/PvZPortable/`
 
 If you prefer to keep everything in the same folder as the executable, you can still configure a custom data directory via the `-changedir` command-line parameter when launching the game.
 
@@ -216,15 +216,15 @@ There's a Python script `scripts/pvzp-v4-converter.py` to inspect and modify `.v
 ```bash
 # Modify these paths as needed
 # View basic info
-python scripts/pvzp-v4-converter.py info ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+python scripts/pvzp-v4-converter.py info ~/.local/io.github.wszqkzqk/PvZPortable/userdata/game1_13.v4
 
 # Export to YAML for editing
-python scripts/pvzp-v4-converter.py export ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 level.yaml
+python scripts/pvzp-v4-converter.py export ~/.local/io.github.wszqkzqk/PvZPortable/userdata/game1_13.v4 level.yaml
 
 # Import back to savegame
 # **BACKUP** your original .v4 file fist!
-mv ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4 ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4.bak
-python scripts/pvzp-v4-converter.py import level.yaml ~/.local/io.github.wszqkzqk/PlantsVsZombies/userdata/game1_13.v4
+mv ~/.local/io.github.wszqkzqk/PvZPortable/userdata/game1_13.v4 ~/.local/io.github.wszqkzqk/PvZPortable/userdata/game1_13.v4.bak
+python scripts/pvzp-v4-converter.py import level.yaml ~/.local/io.github.wszqkzqk/PvZPortable/userdata/game1_13.v4
 ```
 
 ## Contributing
