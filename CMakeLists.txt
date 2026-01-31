@@ -176,7 +176,6 @@ target_link_libraries(pvz-portable PRIVATE
 if (WIN32)
 	if(MSVC)
 		target_compile_options(pvz-portable PRIVATE /utf-8)
-		target_compile_definitions(pvz-portable PRIVATE GLEW_STATIC)
 	endif()
 
 	target_link_libraries(pvz-portable PRIVATE OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
