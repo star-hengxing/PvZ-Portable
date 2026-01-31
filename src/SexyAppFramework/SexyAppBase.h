@@ -8,6 +8,7 @@
 #include "widget/DialogListener.h"
 #include "misc/Buffer.h"
 #include <mutex>
+#include <thread>
 #include "graphics/SharedImage.h"
 #include "misc/Ratio.h"
 #include <atomic>
@@ -171,7 +172,7 @@ public:
 	WidgetManager*			mWidgetManager;
 	DialogMap				mDialogMap;
 	DialogList				mDialogList;
-	pthread_t				mPrimaryThreadId;
+	std::thread::id			mPrimaryThreadId;
 	bool					mSEHOccured;
 	bool					mShutdown;
 	bool					mExitToTop;
@@ -359,7 +360,7 @@ protected:
 	
 	// Loading thread methods	
 	virtual void			LoadingThreadCompleted();
-	static void*			LoadingThreadProcStub(void *theArg);	
+	static void				LoadingThreadProcStub(SexyAppBase *theArg);	
 
 	// Cursor thread methods
 	void					CursorThreadProc();

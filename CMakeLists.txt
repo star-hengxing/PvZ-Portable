@@ -124,7 +124,6 @@ if (NOT NO_GLEW)
 	find_package(GLEW REQUIRED)
 endif()
 if(MSVC)
-	find_package(PThreads4W CONFIG REQUIRED)
 	find_path(DIRENT_INCLUDE_DIRS "dirent.h" REQUIRED)
 endif()
 
@@ -177,7 +176,6 @@ target_link_libraries(pvz-portable PRIVATE
 if (WIN32)
 	if(MSVC)
 		target_compile_options(pvz-portable PRIVATE /utf-8)
-		target_link_libraries(pvz-portable PRIVATE PThreads4W::PThreads4W)
 		target_compile_definitions(pvz-portable PRIVATE GLEW_STATIC)
 	endif()
 

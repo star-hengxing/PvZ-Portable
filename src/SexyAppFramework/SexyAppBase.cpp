@@ -366,7 +366,7 @@ SexyAppBase::SexyAppBase()
 	mWidgetManager = new WidgetManager(this);
 	mResourceManager = new ResourceManager(this);
 
-	mPrimaryThreadId = pthread_self();
+	mPrimaryThreadId = std::this_thread::get_id();
 
 	/*
 	if (GetSystemMetrics(86)) // check for tablet pc
@@ -2243,11 +2243,7 @@ std::string SexyAppBase::GetGameSEHInfo()
 	sprintf(aTimeStr, "%02d:%02d:%02d", (aSecLoaded/60/60), (aSecLoaded/60)%60, aSecLoaded%60);
 	
 	char aThreadIdStr[16];
-#ifdef _MSC_VER
 	sprintf(aThreadIdStr, "n/a");
-#else
-	sprintf(aThreadIdStr, "%lX", (unsigned long)mPrimaryThreadId);
-#endif
 
 	std::string anInfoString = 
 		"Product: " + mProdName + "\r\n" +		
@@ -2270,7 +2266,7 @@ void SexyAppBase::ShutdownHook()
 
 void SexyAppBase::Shutdown()
 {
-	if (!pthread_equal(pthread_self(), mPrimaryThreadId))
+	if (std::this_thread::get_id() != mPrimaryThreadId)
 	{
 		mLoadingFailed = true;
 	}
@@ -3431,7 +3427,7 @@ void SexyAppBase::ClearKeysDown()
 void SexyAppBase::WriteDemoTimingBlock()
 {
 	// Demo writing functions can only be called from the main thread and after SexyAppBase::Init
-	DBG_ASSERTE(pthread_equal(pthread_self(), mPrimaryThreadId));
+	DBG_ASSERTE(std::this_thread::get_id() == mPrimaryThreadId);
 
 	while (mUpdateCount - mLastDemoUpdateCnt > 15)
 	{
@@ -3877,16 +3873,15 @@ void SexyAppBase::LoadingThreadCompleted()
 {
 }
 
-void* SexyAppBase::LoadingThreadProcStub(void *theArg)
+void SexyAppBase::LoadingThreadProcStub(SexyAppBase *theArg)
 {
-	SexyAppBase* aSexyApp = (SexyAppBase*) theArg;
+	SexyAppBase* aSexyApp = theArg;
 	
 	aSexyApp->LoadingThreadProc();		
 
 	printf("Resource Loading Time: %d\r\n", (SDL_GetTicks() - aSexyApp->mTimeLoaded));
 
 	aSexyApp->mLoadingThreadCompleted = true;
-	return 0;
 }
 
 void SexyAppBase::StartLoadingThread()
@@ -3897,9 +3892,7 @@ void SexyAppBase::StartLoadingThread()
 		//::SetThreadPriority(::GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);		
 		mLoadingThreadStarted = true;
 		//_beginthread(LoadingThreadProcStub, 0, this);
-		pthread_t id;
-		pthread_create(&id, nullptr, LoadingThreadProcStub, this);
-		pthread_detach(id);
+		std::thread(LoadingThreadProcStub, this).detach();
 	}
 }
 void SexyAppBase::CursorThreadProc()
@@ -5055,7 +5048,7 @@ void SexyAppBase::InitHook()
 
 void SexyAppBase::Init()
 {
-	mPrimaryThreadId = pthread_self();	
+	mPrimaryThreadId = std::this_thread::get_id();	
 	
 	if (mShutdown)
 		return;
