@@ -214,20 +214,21 @@ FILE *fcaseopen(char const *path, char const *mode)
     return f;
 }
 
-void casechdir(char const *path)
+int casechdir(char const *path)
 {
 #if !defined(_WIN32)
     char *r = alloca(strlen(path) + 3);
     if (casepath(path, r))
     {
-        chdir(r);
+        return chdir(r);
     }
     else
     {
         errno = ENOENT;
+        return -1;
     }
 #else
-    chdir(path);
+    return chdir(path);
 #endif
 }
 
