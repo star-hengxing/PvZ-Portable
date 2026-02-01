@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "graphics/MemoryImage.h"
 #include <mutex>
+#include <set>
 #include "graphics/NativeDisplay.h"
 #include "misc/Rect.h"
 #include "misc/Ratio.h"
