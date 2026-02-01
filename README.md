@@ -35,14 +35,15 @@ This is a **fork** of [Patoke](https://github.com/Patoke/re-plants-vs-zombies) a
   * This project uses a fork of SDL Mixer X that adds compatibility with the MO3 format by using libopenmpt. This fork is located under SexyAppFramework/sound/SDL-Mixer-X
 - [x] main.pak support
 - [x] Optimize memory usage for console ports (Partial)
+- [x] **Compatible** with original PvZ GOTY Edition's ***global user data*** (profile info, adventure progress, coins, Zen Garden, etc., stored in `user*.dat`)
+- [x] **Portable mid-level save game** format `.v4` support (share **mid-level saves** between Windows, Linux, macOS, Switch, etc.)
+  - [x] Support export/import of `.v4` save files to/from human-readable YAML format for easy editing
 - [x] Implement with `std::thread` for cross-platform threading support
 - [x] Implement with `std::filesystem` for cross-platform file system support
 - [x] Replace wide-string with `std::string` and UTF-8 encoding
 - [x] 32 and 64-bit builds support
 - [x] Different CPU architectures support (i686, x86_64, aarch64, riscv64, loongarch64, etc.)
-- [x] **Compatible** with original PvZ GOTY Edition's ***global user data*** (profile info, adventure progress, coins, Zen Garden, etc., stored in `user*.dat`)
-- [x] **Portable mid-level save game** format `.v4` support (share **mid-level saves** between Windows, Linux, macOS, Switch, etc.)
-  - [x] Support export/import of `.v4` save files to/from human-readable YAML format for easy editing
+- [x] Unicode path support on all platforms
 
 * Port the game to these platforms:
 

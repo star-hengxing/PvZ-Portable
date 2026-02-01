@@ -3,6 +3,9 @@
 #if defined(_WIN32)
 #include <direct.h> // chdir on Windows
 #include <malloc.h> // alloca on Windows (MSYS2/UCRT)
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
 #else
 #include <unistd.h> // fix "implicit declaration of function chdir"
 #include <stdlib.h>
@@ -198,8 +201,37 @@ static int casepathat(char const *base, char const *path, char *r)
 }
 #endif
 
+#if defined(_WIN32)
+static wchar_t* utf8_to_wide_alloc(const char* utf8)
+{
+	if (!utf8)
+		return NULL;
+	int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
+	if (len <= 0)
+		return NULL;
+	wchar_t* wide = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)len);
+	if (!wide)
+		return NULL;
+	MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wide, len);
+	return wide;
+}
+#endif
+
 FILE *fcaseopen(char const *path, char const *mode)
 {
+#if defined(_WIN32)
+    wchar_t* wpath = utf8_to_wide_alloc(path);
+    wchar_t* wmode = utf8_to_wide_alloc(mode);
+    if (!wpath || !wmode)
+    {
+        if (wpath) free(wpath);
+        if (wmode) free(wmode);
+        return NULL;
+    }
+    FILE *f = _wfopen(wpath, wmode);
+    free(wpath);
+    free(wmode);
+#else
     FILE *f = fopen(path, mode);
 #if !defined(_WIN32)
     if (!f)
@@ -210,6 +242,7 @@ FILE *fcaseopen(char const *path, char const *mode)
             f = fopen(r, mode);
         }
     }
+#endif
 #endif
     return f;
 }
@@ -228,7 +261,12 @@ int casechdir(char const *path)
         return -1;
     }
 #else
-    return chdir(path);
+    wchar_t* wpath = utf8_to_wide_alloc(path);
+    if (!wpath)
+        return -1;
+    int ret = _wchdir(wpath);
+    free(wpath);
+    return ret;
 #endif
 }
 
@@ -263,7 +301,7 @@ FILE *fcaseopenat(char const *base, char const *path, char const *mode)
     return f;
 #else
     if (!base || base[0] == '\0')
-        return fopen(path, mode);
+        return fcaseopen(path, mode);
 
     size_t baseLen = strlen(base);
     size_t pathLen = strlen(path);
@@ -276,6 +314,6 @@ FILE *fcaseopenat(char const *base, char const *path, char const *mode)
         full[fl] = 0;
     }
     strcpy(full + fl, path);
-    return fopen(full, mode);
+    return fcaseopen(full, mode);
 #endif
 }
