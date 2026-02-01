@@ -22,7 +22,7 @@ This project is licensed under the **[GNU Lesser General Public License v2.1](LI
 * This project is intended solely for **educational purposes**, focusing on **cross-platform porting techniques**, engine modernization, and learning how classic game logic can be adapted to various hardware architectures (e.g., Nintendo Switch, 3DS).
 * Non-Commercial: This project is not affiliated with, authorized, or endorsed by PopCap Games or Electronic Arts.
 * Most of the previous re-implementation code of the framework is contributed by [Patoke](https://github.com/Patoke/) and [Headshotnoby](https://github.com/headshot2017/).
-* Project icons and platform-specific logos are carried over from the original fork by [Headshotnoby](https://github.com/headshot2017/).
+* Project icons and platform-specific logos are created by me (wszqkzqk) with the help of AI image generation tools and are not official assets of PopCap/EA.
 * To play the game using this project you **MUST** have access to the original game files by purchasing it on [EA's official website](https://www.ea.com/games/plants-vs-zombies/plants-vs-zombies) or [Steam](https://store.steampowered.com/app/3590/Plants_vs_Zombies_GOTY_Edition/).
 
 ## Features
