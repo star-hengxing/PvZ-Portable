@@ -82,4 +82,4 @@ Launch from your application menu or terminal:
 pvz-portable
 ```
 
-Data is stored in `~/.local/share/io.github.wszqkzqk/PlantsVsZombies/` by default.
+Data is stored in `~/.local/share/io.github.wszqkzqk/PvZPortable/` by default.
