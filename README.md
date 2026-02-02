@@ -161,18 +161,18 @@ You can customize the game features by adding options to the first `cmake` comma
 | :--- | :--- | :--- |
 | `PVZ_DEBUG` | `OFF`<br>(`ON` if `CMAKE_BUILD_TYPE` is `Debug`) | Enable **cheat keys**, debug displays and other debug features. |
 | `LIMBO_PAGE` | `ON` | Enable access to the limbo page which contains hidden levels. |
-| `DO_FIX_BUGS` | `OFF` | Apply community fixes for "bugs" of official 1.2.0.1073 GOTY Edition.[^1] These "bugs" usually be ***considered as "features"*** by many players, though. |
+| `DO_FIX_BUGS` | `OFF` | Apply community fixes for "bugs" of official 1.2.0.1073 GOTY Edition.[^1] However, these "bugs" are usually **considered "features"** by many players. |
 | `CONSOLE` | `OFF`<br>(`ON` if `CMAKE_BUILD_TYPE` is `Debug`) | Show a console window (Windows only). |
 
 [^1]: Current `DO_FIX_BUGS` includes the following fixes:
     - Fix bungee zombie duplicate sun/item drop in I, Zombie mode.
-    - Mind-controlled Gargantuars smash enemy zombies instead of plants.
-    - Mind-controlled Gargantuars throw mind-controlled Imps (with scale, health, and direction fixes).
-    - Mind-controlled Gargantuars can smash vases in Scary Potter mode.
-    - Mind-controlled Pea/Gatling Head zombies shoot forward instead of backward.
-    - Mind-controlled Jalapeno/Squash zombies damage enemy zombies instead of plants.
+    - Make mind-controlled Gargantuars smash enemy zombies instead of plants.
+    - Make mind-controlled Gargantuars throw mind-controlled Imps (with scale, health, and direction fixes).
+    - Make mind-controlled Gargantuars can smash vases in Scary Potter mode.
+    - Make mind-controlled Pea/Gatling Head zombies shoot forward instead of backward.
+    - Make mind-controlled Jalapeno/Squash zombies damage enemy zombies instead of plants.
     - Coordinate fixes for mind-controlled Squash zombies tracking and smashing enemy zombies.
-    - Jalapeno zombies correctly clear Dr. Zomboss' skills (Iceball/Fireball) and ladder logic.
+    - Make mind-controlled Jalapeno zombies correctly clear Dr. Zomboss' skills (Iceball/Fireball) and ladder logic.
     - Sync Dancer Zombie animations (fixes "Maid" displacement bug).
     - Fix visual glitch of Ladder Zombie's arm recovery.
     - Fix Dr. Zomboss' attack (RV, Fireball/Iceball) and summon range coverage for 6-lane (Pool) levels.
