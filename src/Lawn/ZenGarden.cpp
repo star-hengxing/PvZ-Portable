@@ -911,7 +911,7 @@ void ZenGarden::MouseDownWithFeedingTool(int x, int y, CursorType theCursorType)
         {
             WakeStinky();
             mApp->AddTodParticle(aStinky->mPosX + 40.0f, aStinky->mPosY + 40.0f, aStinky->mRenderOrder + 1, ParticleEffect::PARTICLE_PRESENT_PICKUP);
-            mApp->mPlayerInfo->mLastStinkyChocolateTime = static_cast<int32_t>(time(0));
+            mApp->mPlayerInfo->mLastStinkyChocolateTime = static_cast<uint32_t>(time(0));
             mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_CHOCOLATE)]--;
 
             mApp->PlayFoley(FoleyType::FOLEY_WAKEUP);
@@ -1284,7 +1284,7 @@ void ZenGarden::AddStinky()
     if (!mApp->mPlayerInfo->mHasSeenStinky)
     {
         mApp->mPlayerInfo->mHasSeenStinky = 1;
-        mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] = static_cast<int32_t>(time(0));
+        mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] = static_cast<uint32_t>(time(0));
     }
 
     GridItem* aStinky = mBoard->mGridItems.DataArrayAlloc();
@@ -1525,9 +1525,9 @@ void ZenGarden::StinkyUpdate(GridItem* theStinky)
 {
     Reanimation* aStinkyReanim = mApp->ReanimationGet(theStinky->mGridItemReanimID);
 
-    time_t aNow = time(0);
+    uint32_t aNow = static_cast<uint32_t>(time(0));
     if (mApp->mPlayerInfo->mLastStinkyChocolateTime > aNow || 
-        mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] > aNow)
+        static_cast<uint32_t>(mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)]) > aNow)
     {
         ResetStinkyTimers();
     }
@@ -2364,7 +2364,7 @@ void ZenGarden::DrawPlantOverlay(Graphics* g, Plant* thePlant)
 //0x521FE0
 void ZenGarden::WakeStinky()
 {
-    mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] = static_cast<int32_t>(time(0));
+    mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] = static_cast<uint32_t>(time(0));
     mApp->PlaySample(SOUND_TAP);
     mBoard->ClearAdvice(AdviceType::ADVICE_STINKY_SLEEPING);
     gLawnApp->mPlayerInfo->mHasWokenStinky = 1;
@@ -2373,7 +2373,8 @@ void ZenGarden::WakeStinky()
 //0x522090
 bool ZenGarden::IsStinkyHighOnChocolate()
 {
-    return time(0) - mApp->mPlayerInfo->mLastStinkyChocolateTime < 3600;
+    // Unsigned arithmetic extends limit to 2106 and handles wrap-around correctly so that after 2106 is also OK.
+    return static_cast<uint32_t>(time(0)) - mApp->mPlayerInfo->mLastStinkyChocolateTime < 3600;
 }
 
 bool ZenGarden::PlantHighOnChocolate(PottedPlant* thePottedPlant)
@@ -2394,7 +2395,9 @@ bool ZenGarden::ShouldStinkyBeAwake()
     {
         return true;
     }
-    return time(0) - mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)] < 180;
+    // Unsigned arithmetic extends limit to 2106 and handles wrap-around correctly.
+    return static_cast<uint32_t>(time(0)) -
+        static_cast<uint32_t>(mApp->mPlayerInfo->mPurchases[static_cast<int>(StoreItem::STORE_ITEM_STINKY_THE_SNAIL)]) < 180;
 }
 
 //0x522110

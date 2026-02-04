@@ -32,6 +32,7 @@ This project is **based on** [Patoke](https://github.com/Patoke/re-plants-vs-zom
 - [x] main.pak support
 - [x] Optimize memory usage for console ports (Partial)
 - [x] **Compatible** with original PvZ GOTY Edition's ***global user data*** (profile info, adventure progress, coins, Zen Garden, etc., stored in `user*.dat`)
+  - [x] Fix 2038 year problem while keeping compatibility
 - [x] **Portable mid-level save game** format `.v4` support (share **mid-level saves** between Windows, Linux, macOS, Switch, etc.)
   - [x] Support export/import of `.v4` save files to/from human-readable YAML format for easy editing
 - [x] Implement with `std::thread` for cross-platform threading support
@@ -41,6 +42,7 @@ This project is **based on** [Patoke](https://github.com/Patoke/re-plants-vs-zom
 - [x] Different CPU architectures support (i686, x86_64, aarch64, riscv64, loongarch64, etc.)
 - [x] Unicode path support on all platforms
 - [x] Different endianness support (little-endian and big-endian)
+  - [x] Save data compatibility across endianness
   - Theoretically supports big-endian platforms, but untested due to lack of hardware
 
 This project supports the following platforms:
@@ -53,7 +55,6 @@ This project supports the following platforms:
 | Haiku (SDL2)    | Executable dir (resources); per-user app-data for writable files | Partially works: no music                                                              |
 | Nintendo Switch | sdmc:/switch/PvZPortable | Works on real hardware. Kenji-NX crashes on boot.                           |
 | Nintendo 3DS    | sdmc:/3ds/PvZPortable    | In development, might not have enough memory for Old 3DS, might barely work on New 3DS |
-| Nintendo Wii U  |                              | No work started yet, but planned                                                       |
 
 To play the game, you need the game data from PvZ GOTY. Place `main.pak` and the `properties/` folder next to the `pvz-portable` executable (the game will search for resources relative to the executable's directory). You can also use extracted data instead of `main.pak` if you prefer.
 

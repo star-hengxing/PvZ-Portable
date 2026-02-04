@@ -49,32 +49,32 @@ public:
     std::string         mName;                              //+0x0
     uint32_t            mUseSeq;                            //+0x1C
     uint32_t            mId;                                //+0x20
-    int                 mLevel;                             //+0x24
-    int                 mCoins;                             //+0x28
-    int                 mFinishedAdventure;                 //+0x2C
-    int                 mChallengeRecords[100];             //+0x30
+    int32_t             mLevel;                             //+0x24
+    int32_t             mCoins;                             //+0x28
+    int32_t             mFinishedAdventure;                 //+0x2C
+    int32_t             mChallengeRecords[100];             //+0x30
     int32_t             mPurchases[80];                     //+0x1C0
-    int                 mPlayTimeActivePlayer;              //+0x300
-    int                 mPlayTimeInactivePlayer;            //+0x304
-    int                 mHasUsedCheatKeys;                  //+0x308
-    int                 mHasWokenStinky;                    //+0x30C
-    int                 mDidntPurchasePacketUpgrade;        //+0x310
-    int32_t             mLastStinkyChocolateTime;           //+0x314
-    int                 mStinkyPosX;                        //+0x318
-    int                 mStinkyPosY;                        //+0x31C
-    int                 mHasUnlockedMinigames;              //+0x320
-    int                 mHasUnlockedPuzzleMode;             //+0x324
-    int                 mHasNewMiniGame;                    //+0x328
-    int                 mHasNewScaryPotter;                 //+0x32C
-    int                 mHasNewIZombie;                     //+0x330
-    int                 mHasNewSurvival;                    //+0x334
-    int                 mHasUnlockedSurvivalMode;           //+0x338
-    int                 mNeedsMessageOnGameSelector;        //+0x33C
-    int                 mNeedsMagicTacoReward;              //+0x340
-    int                 mHasSeenStinky;                     //+0x344
-    int                 mHasSeenUpsell;                     //+0x348
-    int                 mPlaceHolderPlayerStats;            //+0x??????
-    int                 mNumPottedPlants;                   //+0x350
+    int32_t             mPlayTimeActivePlayer;              //+0x300
+    int32_t             mPlayTimeInactivePlayer;            //+0x304
+    int32_t             mHasUsedCheatKeys;                  //+0x308
+    int32_t             mHasWokenStinky;                    //+0x30C
+    int32_t             mDidntPurchasePacketUpgrade;        //+0x310
+    uint32_t            mLastStinkyChocolateTime;           //+0x314
+    int32_t             mStinkyPosX;                        //+0x318
+    int32_t             mStinkyPosY;                        //+0x31C
+    int32_t             mHasUnlockedMinigames;              //+0x320
+    int32_t             mHasUnlockedPuzzleMode;             //+0x324
+    int32_t             mHasNewMiniGame;                    //+0x328
+    int32_t             mHasNewScaryPotter;                 //+0x32C
+    int32_t             mHasNewIZombie;                     //+0x330
+    int32_t             mHasNewSurvival;                    //+0x334
+    int32_t             mHasUnlockedSurvivalMode;           //+0x338
+    int32_t             mNeedsMessageOnGameSelector;        //+0x33C
+    int32_t             mNeedsMagicTacoReward;              //+0x340
+    int32_t             mHasSeenStinky;                     //+0x344
+    int32_t             mHasSeenUpsell;                     //+0x348
+    int32_t             mPlaceHolderPlayerStats;            //+0x??????
+    int32_t             mNumPottedPlants;                   //+0x350
     PottedPlant         mPottedPlant[MAX_POTTED_PLANTS];    //+0x358
     bool                mEarnedAchievements[20];            //+GOTY @Patoke: 0x24
     bool                mShownAchievements[20];             //+GOTY
