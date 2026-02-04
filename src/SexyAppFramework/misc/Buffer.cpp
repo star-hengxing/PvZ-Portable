@@ -86,7 +86,7 @@ std::string Buffer::ToWebString() const
 	mReadBitPos = 0;
 
 	char aStr[256];
-	sprintf(aStr, "%08X", aSizeBits);
+	snprintf(aStr, sizeof(aStr), "%08X", aSizeBits);
 	aString += aStr;
 
 	int aNumChars = (aSizeBits + 5) / 6;

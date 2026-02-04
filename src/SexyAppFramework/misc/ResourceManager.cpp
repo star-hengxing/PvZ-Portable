@@ -150,7 +150,7 @@ bool ResourceManager::Fail(const std::string& theErrorText)
 		int aLineNum = mXMLParser->GetCurrentLineNum();
 
 		char aLineNumStr[16];
-		sprintf(aLineNumStr, "%d", aLineNum);	
+		snprintf(aLineNumStr, sizeof(aLineNumStr), "%d", aLineNum);	
 
 		mError = theErrorText;
 

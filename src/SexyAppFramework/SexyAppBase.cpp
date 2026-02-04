@@ -1337,7 +1337,7 @@ std::string SexyAppBase::GetGameSEHInfo()
 	int aSecLoaded = (SDL_GetTicks() - mTimeLoaded) / 1000;
 
 	char aTimeStr[16];
-	sprintf(aTimeStr, "%02d:%02d:%02d", (aSecLoaded/60/60), (aSecLoaded/60)%60, aSecLoaded%60);
+	snprintf(aTimeStr, sizeof(aTimeStr), "%02d:%02d:%02d", (aSecLoaded/60/60), (aSecLoaded/60)%60, aSecLoaded%60);
 
 	std::string anInfoString = 
 		"Product: " + mProdName + "\r\n" +		

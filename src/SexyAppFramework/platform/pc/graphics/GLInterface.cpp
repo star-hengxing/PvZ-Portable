@@ -791,10 +791,10 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 			float y = dstY - 0.5f;
 
 			GLVertex aVertex[4] = {
-				{ {x},          {y},         {0},{aColor},{u1},{v1} },
-				{ {x},          {y+aHeight}, {0},{aColor},{u1},{v2} },
-				{ {x+aWidth},   {y},         {0},{aColor},{u2},{v1} },
-				{ {x+aWidth},   {y+aHeight}, {0},{aColor},{u2},{v2} }
+				{ x,        y,          0, aColor, u1, v1 },
+				{ x,        y+aHeight,  0, aColor, u1, v2 },
+				{ x+aWidth, y,          0, aColor, u2, v1 },
+				{ x+aWidth, y+aHeight,  0, aColor, u2, v2 }
 			};
 #endif
 			glBindTexture(GL_TEXTURE_2D, aTexture);
@@ -1020,10 +1020,10 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 			}
 
 			GLVertex aVertex[4] = {
-				{ {tp[0].x},{tp[0].y},{0},{aColor},{u1},{v1} },
-				{ {tp[1].x},{tp[1].y},{0},{aColor},{u1},{v2} },
-				{ {tp[2].x},{tp[2].y},{0},{aColor},{u2},{v1} },
-				{ {tp[3].x},{tp[3].y},{0},{aColor},{u2},{v2} }
+				{ tp[0].x, tp[0].y, 0, aColor, u1, v1 },
+				{ tp[1].x, tp[1].y, 0, aColor, u1, v2 },
+				{ tp[2].x, tp[2].y, 0, aColor, u2, v1 },
+				{ tp[3].x, tp[3].y, 0, aColor, u2, v2 }
 			};
 
 			glBindTexture(GL_TEXTURE_2D, aTexture);
@@ -1072,9 +1072,9 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 			TriVertex* aTriVerts = (TriVertex*) theVertices[aTriangleNum];
 
 			GLVertex aVertex[3] = {
-				{ {aTriVerts[0].x + tx},{aTriVerts[0].y + ty},	{0},{GetColorFromTriVertex(aTriVerts[0],theColor)},	{aTriVerts[0].u*mMaxTotalU},{aTriVerts[0].v*mMaxTotalV} },
-				{ {aTriVerts[1].x + tx},{aTriVerts[1].y + ty},	{0},{GetColorFromTriVertex(aTriVerts[1],theColor)},	{aTriVerts[1].u*mMaxTotalU},{aTriVerts[1].v*mMaxTotalV} },
-				{ {aTriVerts[2].x + tx},{aTriVerts[2].y + ty},	{0},{GetColorFromTriVertex(aTriVerts[2],theColor)},	{aTriVerts[2].u*mMaxTotalU},{aTriVerts[2].v*mMaxTotalV} }
+				{ aTriVerts[0].x + tx, aTriVerts[0].y + ty, 0, GetColorFromTriVertex(aTriVerts[0], theColor), aTriVerts[0].u*mMaxTotalU, aTriVerts[0].v*mMaxTotalV },
+				{ aTriVerts[1].x + tx, aTriVerts[1].y + ty, 0, GetColorFromTriVertex(aTriVerts[1], theColor), aTriVerts[1].u*mMaxTotalU, aTriVerts[1].v*mMaxTotalV },
+				{ aTriVerts[2].x + tx, aTriVerts[2].y + ty, 0, GetColorFromTriVertex(aTriVerts[2], theColor), aTriVerts[2].u*mMaxTotalU, aTriVerts[2].v*mMaxTotalV }
 			};
 
 			float aMinU = mMaxTotalU, aMinV = mMaxTotalV;
@@ -1588,9 +1588,9 @@ void GLInterface::DrawLine(double theStartX, double theStartY, double theEndX, d
 	glDisable(GL_TEXTURE_2D);
 
 	GLVertex aVertex[3] = {
-		{ {x1},{y1},{0},{theColor.ToInt()},{0},{0} },
-		{ {x2},{y2},{0},{theColor.ToInt()},{0},{0} },
-		{ {x2+0.5f},{y2+0.5f},{0},{theColor.ToInt()},{0},{0} },
+		{ x1, y1, 0, theColor.ToInt(), 0, 0 },
+		{ x2, y2, 0, theColor.ToInt(), 0, 0 },
+		{ x2+0.5f, y2+0.5f, 0, theColor.ToInt(), 0, 0 },
 	};
 
 	GfxBegin(GL_LINE_STRIP);
@@ -1611,10 +1611,10 @@ void GLInterface::FillRect(const Rect& theRect, const Color& theColor, int theDr
 	float aHeight = theRect.mHeight;
 
 	GLVertex aVertex[4] = {
-		{ {x},        {y},         {0},{theColor.ToInt()},{0},{0} },
-		{ {x},        {y+aHeight}, {0},{theColor.ToInt()},{0},{0} },
-		{ {x+aWidth}, {y},         {0},{theColor.ToInt()},{0},{0} },
-		{ {x+aWidth}, {y+aHeight}, {0},{theColor.ToInt()},{0},{0} }
+		{ x,        y,          0, theColor.ToInt(), 0, 0 },
+		{ x,        y+aHeight,  0, theColor.ToInt(), 0, 0 },
+		{ x+aWidth, y,          0, theColor.ToInt(), 0, 0 },
+		{ x+aWidth, y+aHeight,  0, theColor.ToInt(), 0, 0 }
 	};
 
 	if (!mTransformStack.empty())
@@ -1654,9 +1654,9 @@ void GLInterface::DrawTriangle(const TriVertex &p1, const TriVertex &p2, const T
 	glDisable(GL_TEXTURE_2D);
 
 	GLVertex aVertex[3] = {
-		{ {p1.x}, {p1.y}, {0}, {col1}, {0},{0} },
-		{ {p2.x}, {p2.y}, {0}, {col2}, {0},{0} },
-		{ {p3.x}, {p3.y}, {0}, {col3}, {0},{0} },
+		{ p1.x, p1.y, 0, col1, 0, 0 },
+		{ p2.x, p2.y, 0, col2, 0, 0 },
+		{ p3.x, p3.y, 0, col3, 0, 0 },
 	};
 
 	GfxBegin(GL_TRIANGLE_STRIP);
@@ -1723,7 +1723,7 @@ void GLInterface::FillPoly(const Point theVertices[], int theNumVertices, const 
 	VertexList aList;
 	for (int i=0; i<theNumVertices; i++)
 	{
-		GLVertex vert = { {theVertices[i].mX + (float)tx}, {theVertices[i].mY + (float)ty}, {0}, {aColor}, {0}, {0} };
+		GLVertex vert = { theVertices[i].mX + (float)tx, theVertices[i].mY + (float)ty, 0, aColor, 0, 0 };
 		if (!mTransformStack.empty())
 		{
 			SexyVector2 v(vert.sx,vert.sy);

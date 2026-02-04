@@ -53,7 +53,7 @@ void SexyTrace(const char *theStr)
 	{
 		gTraceFileNum = (gTraceFileNum+1)%2;
 		char aBuf[50];
-		sprintf(aBuf,"trace%d.txt",gTraceFileNum+1);
+		snprintf(aBuf, sizeof(aBuf), "trace%d.txt", gTraceFileNum+1);
 		gTraceFile = fopen(aBuf,"w");
 		if (gTraceFile==nullptr)
 			return;
@@ -87,7 +87,7 @@ void SexyTraceFmt(const char* fmt ...)
 	{
 		gTraceFileNum = (gTraceFileNum+1)%2;
 		char aBuf[50];
-		sprintf(aBuf,"trace%d.txt",gTraceFileNum+1);
+		snprintf(aBuf, sizeof(aBuf), "trace%d.txt", gTraceFileNum+1);
 		gTraceFile = fopen(aBuf,"w");
 		if (gTraceFile==nullptr)
 			return;
@@ -158,12 +158,12 @@ void SexyDumpUnfreed()
 		return;
 
 	time_t aTime = time(nullptr);
-	sprintf(buf, "Memory Leak Report for %s\n",	asctime(localtime(&aTime)));
+	snprintf(buf, sizeof(buf), "Memory Leak Report for %s\n", asctime(localtime(&aTime)));
 	fprintf(f, "%s", buf);
 	printf("\n%s", buf);
 	for(i = gSexyAllocMap.begin(); i != gSexyAllocMap.end(); i++) 
 	{
-		sprintf(buf, "%s(%d) : Leak %d byte%s\n", i->second.file, i->second.line, i->second.size,i->second.size>1?"s":"");
+		snprintf(buf, sizeof(buf), "%s(%d) : Leak %d byte%s\n", i->second.file, i->second.line, i->second.size,i->second.size>1?"s":"");
 		printf("%s", buf);
 		fprintf(f, "%s", buf);
 
@@ -224,10 +224,10 @@ void SexyDumpUnfreed()
 	}
 
 
-	sprintf(buf, "-----------------------------------------------------------\n");
+	snprintf(buf, sizeof(buf), "-----------------------------------------------------------\n");
 	fprintf(f, "%s", buf);
 	printf("%s", buf);
-	sprintf(buf, "Total Unfreed: %d bytes (%dKB)\n\n", totalSize, totalSize / 1024);
+	snprintf(buf, sizeof(buf), "Total Unfreed: %d bytes (%dKB)\n\n", totalSize, totalSize / 1024);
 	printf("%s", buf);
 	fprintf(f, "%s", buf);
 }

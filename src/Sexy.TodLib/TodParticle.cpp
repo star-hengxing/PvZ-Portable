@@ -127,7 +127,7 @@ bool TodParticleLoadADef(TodParticleDefinition* theParticleDef, const char* theP
 	if (!DefinitionLoadXML(theParticleFileName, &gParticleDefMap, theParticleDef))
 	{
 		char aBuf[512];
-		sprintf(aBuf, "Failed to load particle '%s'", theParticleFileName);
+		snprintf(aBuf, sizeof(aBuf), "Failed to load particle '%s'", theParticleFileName);
 		TodErrorMessageBox(aBuf, "Error");
 		return false;
 	}
@@ -199,7 +199,7 @@ void TodParticleLoadDefinitions(ParticleParams* theParticleParamArray, int thePa
 		if (!TodParticleLoadADef(&gParticleDefArray[i], aParticleParams.mParticleFileName))
 		{
 			char aBuf[512];
-			sprintf(aBuf, "Failed to load particle '%s'", aParticleParams.mParticleFileName);
+			snprintf(aBuf, sizeof(aBuf), "Failed to load particle '%s'", aParticleParams.mParticleFileName);
 			TodErrorMessageBox(aBuf, "Error");
 		}
 		gSexyAppBase->mNumLoadingThreadTasks += 6;

@@ -406,16 +406,16 @@ bool FontData::HandleCommand(const ListDataElement& theParams)
 
 					char aStr[256];
 
-					sprintf(aStr, "%d", aRectIntVector[0] + aXPos);
+					snprintf(aStr, sizeof(aStr), "%d", aRectIntVector[0] + aXPos);
 					aRectElement->mElementVector.push_back(new SingleDataElement(aStr));
 
-					sprintf(aStr, "%d", aRectIntVector[1]);
+					snprintf(aStr, sizeof(aStr), "%d", aRectIntVector[1]);
 					aRectElement->mElementVector.push_back(new SingleDataElement(aStr));
 
-					sprintf(aStr, "%d", aWidthsVector[aWidthNum]);
+					snprintf(aStr, sizeof(aStr), "%d", aWidthsVector[aWidthNum]);
 					aRectElement->mElementVector.push_back(new SingleDataElement(aStr));
 
-					sprintf(aStr, "%d", aRectIntVector[3]);
+					snprintf(aStr, sizeof(aStr), "%d", aRectIntVector[3]);
 					aRectElement->mElementVector.push_back(new SingleDataElement(aStr));
 
 					aXPos += aWidthsVector[aWidthNum];

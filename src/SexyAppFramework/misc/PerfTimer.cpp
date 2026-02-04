@@ -276,12 +276,12 @@ std::string SexyPerf::GetResults()
 	std::string aResult;
 	char aBuf[512];
 
-	sprintf(aBuf,"Total Time: %.2f\n",gDuration);
+	snprintf(aBuf, sizeof(aBuf), "Total Time: %.2f\n", gDuration);
 	aResult += aBuf;
 	for (PerfInfoSet::iterator anItr = gPerfInfoSet.begin(); anItr != gPerfInfoSet.end(); ++anItr)
 	{
 		const PerfInfo &anInfo = *anItr;
-		sprintf(aBuf,"%s (%d calls, %%%.2f time): %.2f (%.2f avg, %.2f longest)\n",anInfo.mPerfName,anInfo.mCallCount,anInfo.mMillisecondDuration/gDuration*100,anInfo.mMillisecondDuration,anInfo.mMillisecondDuration/anInfo.mCallCount,anInfo.mLongestCall);
+		snprintf(aBuf, sizeof(aBuf), "%s (%d calls, %%%.2f time): %.2f (%.2f avg, %.2f longest)\n", anInfo.mPerfName, anInfo.mCallCount, anInfo.mMillisecondDuration/gDuration*100, anInfo.mMillisecondDuration, anInfo.mMillisecondDuration/anInfo.mCallCount, anInfo.mLongestCall);
 		aResult += aBuf;
 	}
 

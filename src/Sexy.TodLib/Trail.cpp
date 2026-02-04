@@ -61,7 +61,7 @@ void TrailLoadDefinitions(TrailParams* theTrailParamArray, int theTrailParamArra
 		if (!TrailLoadADef(&gTrailDefArray[i], aTrailParams->mTrailFileName))
 		{
 			char aBuf[512];
-			sprintf(aBuf, "Failed to load trail '%s'", aTrailParams->mTrailFileName);
+			snprintf(aBuf, sizeof(aBuf), "Failed to load trail '%s'", aTrailParams->mTrailFileName);
 			TodErrorMessageBox(aBuf, "Error");
 		}
 	}

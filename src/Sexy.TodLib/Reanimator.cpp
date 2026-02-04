@@ -1144,7 +1144,7 @@ void ReanimatorEnsureDefinitionLoaded(ReanimationType theReanimType, bool theIsP
 	if (!ReanimationLoadDefinition(aReanimParams->mReanimFileName, aReanimDef))
 	{
 		char aBuf[1024];
-		sprintf(aBuf, "Failed to load reanim '%s'", aReanimParams->mReanimFileName);
+		snprintf(aBuf, sizeof(aBuf), "Failed to load reanim '%s'", aReanimParams->mReanimFileName);
 		TodErrorMessageBox(aBuf, "Error");
 	}
 	int aDuration = aTimer.GetDuration();
