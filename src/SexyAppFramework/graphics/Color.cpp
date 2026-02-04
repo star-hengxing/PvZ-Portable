@@ -47,14 +47,6 @@ Color::Color(int theRed, int theGreen, int theBlue, int theAlpha) :
 {
 }
 
-Color::Color(const SexyRGBA &theColor) :
-	mRed(theColor.r),
-	mGreen(theColor.g),
-	mBlue(theColor.b),
-	mAlpha(theColor.a)
-{
-}
-
 Color::Color(const uchar* theElements) :
 	mRed(theElements[0]),
 	mGreen(theElements[1]),
@@ -137,14 +129,6 @@ uint32_t Color::ToInt() const
 	if constexpr (std::endian::native == std::endian::big)
 		result = ByteSwap32(result);
 	return result;
-}
-
-SexyRGBA Color::ToRGBA() const
-{
-	return { static_cast<unsigned char>(mBlue),
-	         static_cast<unsigned char>(mGreen),
-	         static_cast<unsigned char>(mRed),
-	         static_cast<unsigned char>(mAlpha) };
 }
 
 bool Sexy::operator==(const Color& theColor1, const Color& theColor2)

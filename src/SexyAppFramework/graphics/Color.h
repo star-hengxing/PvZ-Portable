@@ -6,10 +6,6 @@
 namespace Sexy
 {
 
-#pragma pack(push,1)
-struct SexyRGBA { unsigned char b, g, r, a; };
-#pragma pack(pop)
-
 class Color
 {
 public:
@@ -27,7 +23,6 @@ public:
 	Color(int theColor, int theAlpha);
 	Color(int theRed, int theGreen, int theBlue);
 	Color(int theRed, int theGreen, int theBlue, int theAlpha);
-	Color(const SexyRGBA &theColor);
 	Color(const uchar* theElements);	
 	Color(const int* theElements);
 
@@ -36,7 +31,6 @@ public:
 	int						GetBlue() const;
 	int						GetAlpha() const;
 	uint32_t				ToInt() const;
-	SexyRGBA				ToRGBA() const;
 
 	int&					operator[](int theIdx);
 	int						operator[](int theIdx) const;	
