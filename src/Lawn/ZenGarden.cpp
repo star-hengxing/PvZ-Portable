@@ -1284,7 +1284,9 @@ void ZenGarden::AddStinky()
     if (!mApp->mPlayerInfo->mHasSeenStinky)
     {
         mApp->mPlayerInfo->mHasSeenStinky = 1;
-        mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_STINKY_THE_SNAIL] = static_cast<uint32_t>(time(0));
+        uint32_t aTime = static_cast<uint32_t>(time(0));
+        if (aTime == 0) aTime = 1;
+        mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_STINKY_THE_SNAIL] = aTime;
     }
 
     GridItem* aStinky = mBoard->mGridItems.DataArrayAlloc();
@@ -2364,7 +2366,9 @@ void ZenGarden::DrawPlantOverlay(Graphics* g, Plant* thePlant)
 //0x521FE0
 void ZenGarden::WakeStinky()
 {
-    mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_STINKY_THE_SNAIL] = static_cast<uint32_t>(time(0));
+    uint32_t aTime = static_cast<uint32_t>(time(0));
+    if (aTime == 0) aTime = 1;
+    mApp->mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_STINKY_THE_SNAIL] = aTime;
     mApp->PlaySample(SOUND_TAP);
     mBoard->ClearAdvice(AdviceType::ADVICE_STINKY_SLEEPING);
     gLawnApp->mPlayerInfo->mHasWokenStinky = 1;
