@@ -1685,14 +1685,14 @@ void LawnApp::UpdateFrames()
 		{
 			mBoard->ProcessDeleteQueue();
 		}
-
-		SexyApp::UpdateFrames();
-
-		mMusic->MusicUpdate();
 		if (mLoadingThreadCompleted && mEffectSystem)
 		{
 			mEffectSystem->ProcessDeleteQueue();
 		}
+
+		SexyApp::UpdateFrames();
+
+		mMusic->MusicUpdate();
 
 		CheckForGameEnd();
 	}
