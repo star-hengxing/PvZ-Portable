@@ -239,7 +239,6 @@ public:
 	StoreScreen*					ShowStoreScreen();
 	void							KillStoreScreen();
 	bool							HasSeedType(SeedType theSeedType);
-	/*inline*/ bool					SeedTypeAvailable(SeedType theSeedType);
 	/*inline*/ void					EndLevel();
 	inline bool						IsIceDemo() { return false; }
 	/*inline*/ bool					IsShovelLevel();

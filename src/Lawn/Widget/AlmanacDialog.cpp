@@ -284,7 +284,7 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 	{
 		int aPosX, aPosY;
 		GetSeedPosition(aSeedType, aPosX, aPosY);
-		if (mApp->SeedTypeAvailable(aSeedType))
+		if (mApp->HasSeedType(aSeedType))
 		{
 			if (aSeedType == SeedType::SEED_IMITATER)
 			{
@@ -541,7 +541,7 @@ SeedType AlmanacDialog::SeedHitTest(int x, int y)
 	{
 		for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
 		{
-			if (mApp->SeedTypeAvailable(aSeedType))
+			if (mApp->HasSeedType(aSeedType))
 			{
 				int aSeedX, aSeedY;
 				GetSeedPosition(aSeedType, aSeedX, aSeedY);

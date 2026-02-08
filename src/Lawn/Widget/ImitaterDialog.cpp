@@ -33,7 +33,7 @@ SeedType ImitaterDialog::SeedHitTest(int x, int y)
 {
 	for (SeedType aSeedType = (SeedType)0; aSeedType < SeedType::SEED_GATLINGPEA; aSeedType = (SeedType)(aSeedType + 1))
 	{
-		if (mApp->SeedTypeAvailable(aSeedType))
+		if (mApp->HasSeedType(aSeedType))
 		{
 			int aSeedX, aSeedY;
 			GetSeedPosition(aSeedType, aSeedX, aSeedY);
@@ -82,7 +82,7 @@ void ImitaterDialog::Draw(Graphics* g)
 	g->SetLinearBlend(true);
 	for (SeedType aSeedType = (SeedType)0; aSeedType < SeedType::SEED_GATLINGPEA; aSeedType = (SeedType)(aSeedType + 1))
 	{
-		if (mApp->SeedTypeAvailable(aSeedType))
+		if (mApp->HasSeedType(aSeedType))
 		{
 			int aSeedX, aSeedY;
 			GetSeedPosition(aSeedType, aSeedX, aSeedY);

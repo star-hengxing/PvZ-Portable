@@ -353,7 +353,7 @@ void CutScene::PreloadResources()
 
 	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < SeedType::NUM_SEED_TYPES; aSeedType = static_cast<SeedType>(static_cast<int>(aSeedType) + 1))
 	{
-		if (mApp->SeedTypeAvailable(aSeedType))
+		if (mApp->HasSeedType(aSeedType))
 		{
 			Plant::PreloadPlantResources(aSeedType);
 		}

@@ -2440,11 +2440,6 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 	}
 }
 
-bool LawnApp::SeedTypeAvailable(SeedType theSeedType)
-{
-	return HasSeedType(theSeedType);
-}
-
 //0x453C30
 Reanimation* LawnApp::AddReanimation(float theX, float theY, int theRenderOrder, ReanimationType theReanimationType)
 {
@@ -3118,7 +3113,7 @@ int LawnApp::GetNumPreloadingTasks()
 	{
 		for (SeedType i = SeedType::SEED_PEASHOOTER; i < SeedType::NUM_SEED_TYPES; i = static_cast<SeedType>(static_cast<int>(i) + 1))
 		{
-			if (SeedTypeAvailable(i) || HasFinishedAdventure())
+			if (HasSeedType(i) || HasFinishedAdventure())
 			{
 				aTaskCount++;
 			}
@@ -3175,7 +3170,7 @@ void LawnApp::PreloadForUser()
 	{
 		for (SeedType i = SeedType::SEED_PEASHOOTER; i < SeedType::NUM_SEED_TYPES; i = static_cast<SeedType>(static_cast<int>(i) + 1))
 		{
-			if (SeedTypeAvailable(i) || HasFinishedAdventure())
+			if (HasSeedType(i) || HasFinishedAdventure())
 			{
 				Plant::PreloadPlantResources(i);
 				if (mCompletedLoadingThreadTasks < aNumTasks)

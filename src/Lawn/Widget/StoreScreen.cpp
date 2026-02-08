@@ -1043,7 +1043,7 @@ void StoreScreen::PurchaseItem(StoreItem theStoreItem)
             // @Patoke: implemented
             bool aGiveAchievement = true;
             for (int i = STORE_ITEM_PLANT_GATLINGPEA; i <= STORE_ITEM_PLANT_IMITATER; i++) {
-                if (mApp->SeedTypeAvailable(SeedType(i)))
+                if (mApp->HasSeedType(SeedType(i)))
                     aGiveAchievement = false;
             }
 

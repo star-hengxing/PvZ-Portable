@@ -1945,7 +1945,7 @@ void Challenge::UpdateRainingSeeds()
 		aSeedType = (SeedType)Rand(mApp->GetSeedsAvailable());
 	while (
 		mBoard->SeedNotRecommendedForLevel(aSeedType) || 
-		!mApp->SeedTypeAvailable(aSeedType) || 
+		!mApp->HasSeedType(aSeedType) || 
 		Plant::IsUpgrade(aSeedType) || 
 		aSeedType == SEED_SUNFLOWER || 
 		aSeedType == SEED_TWINSUNFLOWER || 
