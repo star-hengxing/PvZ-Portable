@@ -2411,49 +2411,38 @@ bool LawnApp::HasSeedType(SeedType theSeedType)
 		return false;
 
 	/*  优化
-	if (theSeedType >= SeedType::SEED_TWINSUNFLOWER && theSeedType <= SeedType::SEED_IMITATER)
+	if (theSeedType >= SeedType::SEED_GATLINGPEA && theSeedType <= SeedType::SEED_IMITATER)
 		return mPlayerInfo->mPurchases[theSeedType - SeedType::SEED_GATLINGPEA];
 	*/
 
-	if (theSeedType == SeedType::SEED_TWINSUNFLOWER)
+	switch (theSeedType)
 	{
+	case SeedType::SEED_GATLINGPEA:
+		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GATLINGPEA] > 0;
+	case SeedType::SEED_TWINSUNFLOWER:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_TWINSUNFLOWER] > 0;
-	}
-	if (theSeedType == SeedType::SEED_GLOOMSHROOM)
-	{
+	case SeedType::SEED_GLOOMSHROOM:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GLOOMSHROOM] > 0;
-	}
-	if (theSeedType == SeedType::SEED_CATTAIL)
-	{
+	case SeedType::SEED_CATTAIL:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_CATTAIL] > 0;
-	}
-	if (theSeedType == SeedType::SEED_WINTERMELON)
-	{
+	case SeedType::SEED_WINTERMELON:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_WINTERMELON] > 0;
-	}
-	if (theSeedType == SeedType::SEED_GOLD_MAGNET)
-	{
+	case SeedType::SEED_GOLD_MAGNET:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GOLD_MAGNET] > 0;
-	}
-	if (theSeedType == SeedType::SEED_SPIKEROCK)
-	{
+	case SeedType::SEED_SPIKEROCK:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_SPIKEROCK] > 0;
-	}
-	if (theSeedType == SeedType::SEED_COBCANNON)
-	{
+	case SeedType::SEED_COBCANNON:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_COBCANNON] > 0;
-	}
-	if (theSeedType == SeedType::SEED_IMITATER)
-	{
+	case SeedType::SEED_IMITATER:
 		return mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_IMITATER] > 0;
+	default:
+		return theSeedType < GetSeedsAvailable();
 	}
-
-	return theSeedType < GetSeedsAvailable();
 }
 
 bool LawnApp::SeedTypeAvailable(SeedType theSeedType)
 {
-	return (theSeedType == SeedType::SEED_GATLINGPEA && mPlayerInfo->mPurchases[StoreItem::STORE_ITEM_PLANT_GATLINGPEA]) || HasSeedType(theSeedType);
+	return HasSeedType(theSeedType);
 }
 
 //0x453C30
