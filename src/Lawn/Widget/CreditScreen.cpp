@@ -12,6 +12,9 @@
 #include "widget/Dialog.h"
 #include "../../Sexy.TodLib/EffectSystem.h"
 #include "../../Sexy.TodLib/TodStringFile.h"
+#include "graphics/Font.h"
+
+static constexpr float CREDIT_SCREEN_ANIM_RATE = 0.3f;
 
 static CreditsTiming gCreditsTiming[] = {  //0x6A1AD8
     {  128.5f,      CreditWordType::WORD_AW ,         0,     CreditBrainType::BRAIN_OFF       },
@@ -722,28 +725,92 @@ void CreditScreen::DrawOverlay(Graphics* g)
     }
 }
 
-//0x435550
+static int DrawCreditsContent(Graphics* g, int theYPos, bool theDraw)
+{
+    _Font* aTitleFont = FONT_HOUSEOFTERROR28;
+    _Font* aCreditsFont = FONT_HOUSEOFTERROR16;
+    int aLineHeight = aCreditsFont->GetLineSpacing();
+
+    constexpr int ROLES_RIGHT_X = BOARD_WIDTH / 2 - 15;
+    constexpr int NAMES_LEFT_X = BOARD_WIDTH / 2 + 15;
+
+    int aYPos = theYPos;
+    int aStartY = aYPos;
+
+    // Title
+    if (theDraw && aYPos > -aTitleFont->GetLineSpacing() && aYPos < BOARD_HEIGHT + aTitleFont->GetLineSpacing())
+        TodDrawString(g, "[CREDITS_GAMENAME]", BOARD_WIDTH / 2, aYPos, aTitleFont, Color::White, DrawStringJustification::DS_ALIGN_CENTER);
+    aYPos += aTitleFont->GetLineSpacing() + 20;
+
+    for (int aSection = 3; aSection <= 11; aSection++)
+    {
+        std::string aRolesKey = StrFormat("[CREDITS_ROLES%d]", aSection);
+        if (!TodStringListExists(aRolesKey))
+            continue;
+
+        std::string aRoles = TodStringTranslate(aRolesKey);
+
+        // ^ prefix: spacer or centered header
+        if (!aRoles.empty() && aRoles[0] == '^')
+        {
+            if (aRoles.size() > 1)
+            {
+                if (theDraw && aYPos > -aLineHeight && aYPos < BOARD_HEIGHT + aLineHeight)
+                    TodDrawString(g, aRoles.substr(1), BOARD_WIDTH / 2, aYPos, aCreditsFont, Color::White, DrawStringJustification::DS_ALIGN_CENTER);
+            }
+            aYPos += aLineHeight + 10;
+            continue;
+        }
+
+        std::string aNamesKey = StrFormat("[CREDITS_NAMES%d]", aSection);
+        std::string aNames = TodStringListExists(aNamesKey) ? TodStringTranslate(aNamesKey) : "";
+
+        // Split roles and names by newline, draw side by side
+        size_t aRolePos = 0;
+        size_t aNamePos = 0;
+        while (aRolePos < aRoles.size() || aNamePos < aNames.size())
+        {
+            bool aVisible = theDraw && aYPos > -aLineHeight && aYPos < BOARD_HEIGHT + aLineHeight;
+            if (aRolePos < aRoles.size())
+            {
+                size_t aRoleEnd = aRoles.find('\n', aRolePos);
+                if (aRoleEnd == std::string::npos) aRoleEnd = aRoles.size();
+                if (aVisible && aRoleEnd > aRolePos)
+                    TodDrawString(g, aRoles.substr(aRolePos, aRoleEnd - aRolePos), ROLES_RIGHT_X, aYPos, aCreditsFont, Color::White, DrawStringJustification::DS_ALIGN_RIGHT);
+                aRolePos = aRoleEnd + 1;
+            }
+            if (aNamePos < aNames.size())
+            {
+                size_t aNameEnd = aNames.find('\n', aNamePos);
+                if (aNameEnd == std::string::npos) aNameEnd = aNames.size();
+                if (aVisible && aNameEnd > aNamePos)
+                    TodDrawString(g, aNames.substr(aNamePos, aNameEnd - aNamePos), NAMES_LEFT_X, aYPos, aCreditsFont, Color::White, DrawStringJustification::DS_ALIGN_LEFT);
+                aNamePos = aNameEnd + 1;
+            }
+            aYPos += aLineHeight;
+        }
+        aYPos += 10;
+    }
+    return aYPos - aStartY;
+}
+
+// Original 0x435550 version is replaced by this new version.
+// Based on wszqkzqk's observations and speculations about GOTY's behavior.
 void CreditScreen::DrawFinalCredits(Graphics* g)
 {
-    TodDrawString(g, "[CREDITS_GAMENAME]", BOARD_WIDTH / 2, 60, FONT_HOUSEOFTERROR28, Color::White, DrawStringJustification::DS_ALIGN_CENTER);
+    // Measure total content height (no draw)
+    int aContentHeight = DrawCreditsContent(nullptr, 0, false);
+    int aTotalCycle = aContentHeight + BOARD_HEIGHT;  // full loop: content scrolls entirely through screen
+    int aScrollOffset = static_cast<int>(mCreditsPhaseCounter * CREDIT_SCREEN_ANIM_RATE) % aTotalCycle;
 
-    Rect aRectNames1(405, 90, 200, 200);
-    TodDrawStringWrapped(g, "[CREDITS_NAMES1]", aRectNames1, FONT_HOUSEOFTERROR16, Color::White, DrawStringJustification::DS_ALIGN_LEFT);
-    Rect aRectRoles1(190, 90, 200, 200);
-    TodDrawStringWrapped(g, "[CREDITS_ROLES1]", aRectRoles1, FONT_HOUSEOFTERROR16, Color::White, DrawStringJustification::DS_ALIGN_RIGHT);
-    Rect aRectNames2(340, 280, 450, 250);
-    TodDrawStringWrapped(g, "[CREDITS_NAMES2]", aRectNames2, FONT_HOUSEOFTERROR16, Color::White, DrawStringJustification::DS_ALIGN_LEFT);
-    Rect aRectRoles2(30, 280, 300, 250);
-    TodDrawStringWrapped(g, "[CREDITS_ROLES2]", aRectRoles2, FONT_HOUSEOFTERROR16, Color::White, DrawStringJustification::DS_ALIGN_RIGHT);
-
-    TodDrawString(g, "[CREDITS_THANKS]", BOARD_WIDTH / 2, 530, FONT_HOUSEOFTERROR16, Color::White, DrawStringJustification::DS_ALIGN_CENTER);
+    DrawCreditsContent(g, BOARD_HEIGHT - aScrollOffset, true);
 }
 
 //0x435A90
 void DrawReanimToPreload(Graphics* g, ReanimationType theReanimType)
 {
     Reanimation aReanim;
-    aReanim.mAnimRate = 0.3f;
+    aReanim.mAnimRate = CREDIT_SCREEN_ANIM_RATE;
     aReanim.ReanimationInitializeType(0.0f, 0.0f, theReanimType);
     aReanim.Draw(g);
 }
