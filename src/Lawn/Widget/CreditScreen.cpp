@@ -915,7 +915,8 @@ void CreditScreen::Draw(Graphics* g)
         {
             Graphics aBackground1G(*g);
             aBackground1G.ClipRect(aTransformBackground1.mTransX, aTransformBackground1.mTransY, aTransformBackground1.mImage->mWidth - 1, aTransformBackground1.mImage->mHeight - 1);
-            aBackground1G.DrawImageF(IMAGE_BACKGROUND1, aTransformBackground1.mTransX - BOARD_WIDTH / 2, aTransformBackground1.mTransY - BOARD_HEIGHT / 2);
+            // Digger zombie says "I like your tricycle" at this position (determined by adjusting and comparing it with the original version)
+            aBackground1G.DrawImageF(IMAGE_BACKGROUND1, aTransformBackground1.mTransX - BOARD_WIDTH / 10, aTransformBackground1.mTransY - BOARD_HEIGHT * 0.6f);
         }
         if (aTransformBackground3.mFrame != -1.0f)
         {
