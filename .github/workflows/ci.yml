@@ -237,3 +237,49 @@ jobs:
       with:
         name: pvz-portable-macos
         path: dist/
+
+  release:
+    name: Release
+    needs: ['build-archlinux', 'build-windows-msys2-ucrt64', 'build-windows-msvc-x64', 'build-macos']
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare Release Files
+      run: |
+        mkdir release_files
+
+        echo "Preparing Arch Linux file..."
+        chmod +x artifacts/pvz-portable-archlinux/pvz-portable
+        mv artifacts/pvz-portable-archlinux/pvz-portable release_files/pvz-portable-linux-x86_64
+
+        echo "Preparing Windows MSVC file..."
+        mv artifacts/pvz-portable-windows-msvc-x64/pvz-portable.exe release_files/pvz-portable-windows-x64-static.exe
+
+        echo "Preparing Windows MSYS2 file..."
+        cd artifacts/pvz-portable-windows-msys2-ucrt64
+        zip -r ../../release_files/pvz-portable-windows-ucrt64.zip .
+        cd ../..
+
+        echo "Preparing macOS file..."
+        cd artifacts/pvz-portable-macos
+        chmod +x pvz-portable
+        zip -r -y ../../release_files/pvz-portable-macos-aarch64.zip .
+        cd ../..
+
+        echo "Final files:"
+        ls -lh release_files/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: release_files/*
+        generate_release_notes: true
+        draft: false
+        prerelease: false
