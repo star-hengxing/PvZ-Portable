@@ -99,6 +99,7 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 
 	uint32_t aMagic = 0;
 	FRead(&aMagic, sizeof(uint32_t), 1, aFP);
+	aMagic = Sexy::FromLE32(aMagic);
 	if (aMagic != 0xBAC04AC0)
 	{
 		FClose(aFP);
@@ -107,6 +108,7 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 
 	uint32_t aVersion = 0;
 	FRead(&aVersion, sizeof(uint32_t), 1, aFP);
+	aVersion = Sexy::FromLE32(aVersion);
 	if (aVersion > 0)
 	{
 		FClose(aFP);
@@ -129,8 +131,10 @@ bool PakInterface::AddPakFile(const std::string& theFileName)
 		
 		int aSrcSize = 0;
 		FRead(&aSrcSize, sizeof(int), 1, aFP);
+		aSrcSize = static_cast<int>(Sexy::FromLE32(static_cast<uint32_t>(aSrcSize)));
 		int64_t aFileTime;
 		FRead(&aFileTime, sizeof(int64_t), 1, aFP);
+		aFileTime = static_cast<int64_t>(Sexy::FromLE64(static_cast<uint64_t>(aFileTime)));
 
 		for (int i = 0; i < aNameWidth; i++)
 		{

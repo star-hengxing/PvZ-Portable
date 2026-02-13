@@ -176,24 +176,30 @@ Image* GetTGAImage(const std::string& theFileName)
 
 	uint16_t aFirstEntryIdx;
 	p_fread(&aFirstEntryIdx, sizeof(uint16_t), 1, aTGAFile);
+	aFirstEntryIdx = Sexy::FromLE16(aFirstEntryIdx);
 
 	uint16_t aColorMapLen;
 	p_fread(&aColorMapLen, sizeof(uint16_t), 1, aTGAFile);
+	aColorMapLen = Sexy::FromLE16(aColorMapLen);
 
 	uint8_t aColorMapEntrySize;
 	p_fread(&aColorMapEntrySize, sizeof(uint8_t), 1, aTGAFile);	
 
 	uint16_t anXOrigin;
 	p_fread(&anXOrigin, sizeof(uint16_t), 1, aTGAFile);
+	anXOrigin = Sexy::FromLE16(anXOrigin);
 
 	uint16_t aYOrigin;
 	p_fread(&aYOrigin, sizeof(uint16_t), 1, aTGAFile);
+	aYOrigin = Sexy::FromLE16(aYOrigin);
 
 	uint16_t anImageWidth;
 	p_fread(&anImageWidth, sizeof(uint16_t), 1, aTGAFile);	
+	anImageWidth = Sexy::FromLE16(anImageWidth);
 
 	uint16_t anImageHeight;
 	p_fread(&anImageHeight, sizeof(uint16_t), 1, aTGAFile);	
+	anImageHeight = Sexy::FromLE16(anImageHeight);
 
 	uint8_t aBitCount = 32;
 	p_fread(&aBitCount, sizeof(uint8_t), 1, aTGAFile);	
@@ -286,12 +292,14 @@ Image* GetGIFImage(const std::string& theFileName)
 	global_colors = 0;
 	global_colormap = (unsigned char*)nullptr;
 
-	short pw;  // 图像宽度
-	short ph;  // 图像高度
+	uint16_t pw;  // 图像宽度
+	uint16_t ph;  // 图像高度
 
 	// 读取逻辑屏幕描述符，共 7 字节
 	p_fread(&pw, sizeof(short), 1, fp);  // 读取图像渲染区域的宽度
 	p_fread(&ph, sizeof(short), 1, fp);  // 读取图像渲染区域的高度
+	pw = Sexy::FromLE16(pw);
+	ph = Sexy::FromLE16(ph);
 	p_fread(&flag, sizeof(char), 1, fp);  // 读取图像标志
 	p_fread(&background, sizeof(char), 1, fp);  // 读取背景色在全局颜色列表中的索引，若无全局颜色列表则此字节无效
 	p_fread(&c, sizeof(char), 1, fp);  // 读取像素宽高比
@@ -419,10 +427,10 @@ Image* GetGIFImage(const std::string& theFileName)
 		}
 		image_count++;
 
-		short pagex;
-		short pagey;
-		short width;
-		short height;
+		uint16_t pagex;
+		uint16_t pagey;
+		uint16_t width;
+		uint16_t height;
 		int colors;
 		bool interlaced;
 
@@ -430,6 +438,10 @@ Image* GetGIFImage(const std::string& theFileName)
 		p_fread(&pagey, sizeof(short), 1, fp);  // 读取帧的纵坐标（Top）
 		p_fread(&width, sizeof(short), 1, fp);  // 读取帧的横向宽度（Width）
 		p_fread(&height, sizeof(short), 1, fp);  // 取得帧的纵向高度（Height）
+		pagex = Sexy::FromLE16(pagex);
+		pagey = Sexy::FromLE16(pagey);
+		width = Sexy::FromLE16(width);
+		height = Sexy::FromLE16(height);
 		p_fread(&flag, sizeof(char), 1, fp);  // 读取帧标志的压缩字节
 
 		colors = !BitSet(flag, 0x80) ? global_colors : 1 << ((flag & 0x07) + 1);  // 判断使用全局颜色列表或使用局部颜色列表，并取得列表大小
@@ -985,24 +997,30 @@ bool ImageLib::WriteTGAImage(const std::string& theFileName, Image* theImage)
 	fwrite(&anImageType, sizeof(uint8_t), 1, aTGAFile);
 
 	uint16_t aFirstEntryIdx = 0;
+	aFirstEntryIdx = Sexy::ToLE16(aFirstEntryIdx);
 	fwrite(&aFirstEntryIdx, sizeof(uint16_t), 1, aTGAFile);
 
 	uint16_t aColorMapLen = 0;
+	aColorMapLen = Sexy::ToLE16(aColorMapLen);
 	fwrite(&aColorMapLen, sizeof(uint16_t), 1, aTGAFile);
 
 	uint8_t aColorMapEntrySize = 0;
 	fwrite(&aColorMapEntrySize, sizeof(uint8_t), 1, aTGAFile);	
 
 	uint16_t anXOrigin = 0;
+	anXOrigin = Sexy::ToLE16(anXOrigin);
 	fwrite(&anXOrigin, sizeof(uint16_t), 1, aTGAFile);
 
 	uint16_t aYOrigin = 0;
+	aYOrigin = Sexy::ToLE16(aYOrigin);
 	fwrite(&aYOrigin, sizeof(uint16_t), 1, aTGAFile);
 
 	uint16_t anImageWidth = theImage->mWidth;
+	anImageWidth = Sexy::ToLE16(anImageWidth);
 	fwrite(&anImageWidth, sizeof(uint16_t), 1, aTGAFile);	
 
 	uint16_t anImageHeight = theImage->mHeight;
+	anImageHeight = Sexy::ToLE16(anImageHeight);
 	fwrite(&anImageHeight, sizeof(uint16_t), 1, aTGAFile);	
 
 	uint8_t aBitCount = 32;
@@ -1011,7 +1029,17 @@ bool ImageLib::WriteTGAImage(const std::string& theFileName, Image* theImage)
 	uint8_t anImageDescriptor = 8 | (1<<5);
 	fwrite(&anImageDescriptor, sizeof(uint8_t), 1, aTGAFile);
 
-	fwrite(theImage->mBits, 4, theImage->mWidth*theImage->mHeight, aTGAFile);
+	if constexpr (std::endian::native == std::endian::little)
+	{
+		fwrite(theImage->mBits, 4, theImage->mWidth * theImage->mHeight, aTGAFile);
+	}
+	else
+	{
+		std::vector<uint32_t> aPixelsLE(theImage->mBits, theImage->mBits + theImage->mWidth * theImage->mHeight);
+		for (uint32_t& pixel : aPixelsLE)
+			pixel = Sexy::ToLE32(pixel);
+		fwrite(aPixelsLE.data(), 4, aPixelsLE.size(), aTGAFile);
+	}
 
 	fclose(aTGAFile);
 
