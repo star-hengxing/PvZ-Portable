@@ -19,6 +19,8 @@
 
 using namespace Sexy;
 
+bool gDesktopGLFallback = false;
+
 static inline uint32_t ArgbToRgba(uint32_t argb) noexcept
 {
 	uint32_t abgr = (argb & 0xFF00FF00u)
@@ -172,15 +174,19 @@ static const char *SHADER_CODE =
 
 static GLuint shaderCompile(const char *src, uint32_t srcLen, GLenum type)
 {
-	const char *preamble = (type == GL_VERTEX_SHADER)
-		? GLSL_VERT_PREAMBLE "#define VERTEX\n"
-		: GLSL_FRAG_PREAMBLE "#define FRAGMENT\n";
+	// GLSL ES 1.00 for native ES contexts; GLSL 1.20 for desktop GL fallback.
+	const char *versionLine = gDesktopGLFallback
+		? "#version 120\n"
+		: "#version 100\nprecision mediump float;\n";
+	const char *macros = (type == GL_VERTEX_SHADER)
+		? GLSL_VERT_MACROS "#define VERTEX\n"
+		: GLSL_FRAG_MACROS "#define FRAGMENT\n";
 
-	const GLchar *strings[2]  = { preamble, src };
-	GLint         lengths[2]  = { (GLint)strlen(preamble), (GLint)srcLen };
+	const GLchar *strings[3]  = { versionLine, macros, src };
+	GLint         lengths[3]  = { (GLint)strlen(versionLine), (GLint)strlen(macros), (GLint)srcLen };
 
 	GLuint shader = glCreateShader(type);
-	glShaderSource(shader, 2, strings, lengths);
+	glShaderSource(shader, 3, strings, lengths);
 	glCompileShader(shader);
 
 	GLint ok;
@@ -191,7 +197,7 @@ static GLuint shaderCompile(const char *src, uint32_t srcLen, GLenum type)
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLen);
 		char *log = (char*)malloc(logLen);
 		glGetShaderInfoLog(shader, logLen, &logLen, log);
-		printf("Shader error: %s\n%s\n%s\n", log, strings[0], strings[1]);
+		printf("Shader error: %s\n%s%s%s\n", log, strings[0], strings[1], strings[2]);
 		fflush(stdout);
 		free(log);
 		exit(1);
