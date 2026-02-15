@@ -62,9 +62,9 @@ Note about writable data and caches:
 
 - The game will read resources (like `main.pak` and `properties/`) from the executable directory by default, so you can launch the binary from any working directory and it will still find them.
 - Per-user writable files (settings, savegames, compiled caches, screenshots) are stored in the **OS-recommended application data path**. With the current build these are under `io.github.wszqkzqk/PvZPortable` and include subfolders such as:
-  - `userdata/` — player save files
-  - `cache64/` if you use the 64-bit version or `cache32/` if you use the 32-bit version — compiled binary caches (reanimation / compiled definitions)
-  - `registry.regemu` — settings/registry emulation
+  - `userdata/` — Player save files.
+  - `cache64/` if you use the 64-bit version or `cache32/` if you use the 32-bit version — Compiled binary caches (reanimation / compiled definitions). These caches are **local startup** artifacts (**native layout**), not portable files; when cache/schema checks fail, the game transparently recompiles from source data.
+  - `registry.regemu` — Settings/registry emulation.
 
 Examples:
 
