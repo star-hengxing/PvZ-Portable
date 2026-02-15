@@ -37,22 +37,18 @@ list(REMOVE_ITEM SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/Sexy.TodLib/TodDrawTriangleInc.cpp
 )
 
-set(NO_GLEW OFF CACHE BOOL "Disable GLEW")
 set(LOW_MEMORY OFF CACHE BOOL "Enable low memory mode")
 set(DOWNSCALE_COUNT 1 CACHE STRING "Image downscale count")
 if(NINTENDO_SWITCH)
-	set(NO_GLEW ON)
 	set(VORBIS_LIB vorbisfile vorbis)
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/graphics/Window.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/graphics/GLInterface.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch/Input.cpp
 	)
 	list(APPEND PLAT_INCLUDES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/switch
 	)
 elseif(NINTENDO_3DS)
-	set(NO_GLEW ON)
 	set(LOW_MEMORY ON)
 	set(DOWNSCALE_COUNT 2)
 	ctr_add_shader_library(colored ${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/3ds/graphics/colored.v.pica)
@@ -90,7 +86,6 @@ else()
 	endif()
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/graphics/Window.cpp
-		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/graphics/GLInterface.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/pc/Input.cpp
 	)
 	list(APPEND PLAT_INCLUDES
@@ -111,15 +106,12 @@ option(LIMBO_PAGE "Enable limbo page to access hidden levels" ON)
 option(CONSOLE "Show console on Windows" ${WIN_CONSOLE_DEFAULT})
 option(DO_FIX_BUGS "Define DO_FIX_BUGS macro (Community fixes for original game bugs of 1.2.0.1073 GOTY Edition)" OFF)
 
-set(OpenGL_GL_PREFERENCE GLVND)
-
 find_package(ZLIB REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 REQUIRED)
-find_package(OpenGL REQUIRED)
-if (NOT NO_GLEW)
-	find_package(GLEW REQUIRED)
+if(NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS)
+	find_library(GLES2_LIBRARY GLESv2 REQUIRED)
 endif()
 
 set(SDL_MIXER_X_STATIC ON CACHE BOOL "Build static library of SDL Mixer X")
@@ -134,11 +126,11 @@ add_subdirectory(src/SexyAppFramework/sound/SDL-Mixer-X)
 
 add_executable(pvz-portable ${SOURCES})
 target_include_directories(pvz-portable PRIVATE
+	${PLAT_INCLUDES}
 	${PROJECT_SOURCE_DIR}/src
 	${PROJECT_SOURCE_DIR}/src/SexyAppFramework
 	${PROJECT_SOURCE_DIR}/src/SexyAppFramework/sound/SDL-Mixer-X/include
 	${SDL2_INCLUDE_DIRS}
-	${PLAT_INCLUDES}
 )
 target_compile_definitions(pvz-portable PRIVATE
 	$<$<BOOL:${PVZ_DEBUG}>:_PVZ_DEBUG>
@@ -179,7 +171,7 @@ if (WIN32)
 			OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/icon.ico"
 	)
 
-	target_link_libraries(pvz-portable PRIVATE OpenGL::GL ws2_32 user32 gdi32 winmm imm32 shlwapi)
+	target_link_libraries(pvz-portable PRIVATE ${GLES2_LIBRARY} ws2_32 user32 gdi32 winmm imm32 shlwapi)
 	target_compile_definitions(pvz-portable PRIVATE WINDOWS)
 
 	if(NOT CONSOLE)
@@ -190,7 +182,7 @@ if (WIN32)
 		endif()
 	endif()
 elseif (NINTENDO_SWITCH)
-	target_link_libraries(pvz-portable PRIVATE glad EGL glapi drm_nouveau)
+	target_link_libraries(pvz-portable PRIVATE GLESv2 EGL glapi drm_nouveau)
 
 	nx_generate_nacp(pvz-portable.nacp
 		NAME "PvZ Portable"
@@ -217,9 +209,5 @@ elseif (NINTENDO_3DS)
 		SMDH pvz-portable.smdh
 	)
 else()
-	target_link_libraries(pvz-portable PRIVATE OpenGL::GL)
-endif()
-
-if (NOT NO_GLEW)
-	target_link_libraries(pvz-portable PRIVATE GLEW::GLEW)
+	target_link_libraries(pvz-portable PRIVATE ${GLES2_LIBRARY})
 endif()
