@@ -17,6 +17,10 @@
 
 #define MAX_VERTICES 16384
 
+#ifndef GL_FRAMEBUFFER_SRGB
+#define GL_FRAMEBUFFER_SRGB 0x8DB9 // Not in GLES 2.0 headers, but needed to disable sRGB on Windows.
+#endif
+
 using namespace Sexy;
 
 bool gDesktopGLFallback = false;
@@ -1111,6 +1115,8 @@ int GLInterface::Init(bool IsWindowed)
 	glDisable(GL_DITHER);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	glDisable(GL_FRAMEBUFFER_SRGB); // Prevent double gamma correction (already sRGB passthrough)
+	glGetError(); // clear GL_INVALID_ENUM on pure GLES implementations
 
 	mRGBBits   = 32;
 	mRedBits   = 8; mGreenBits = 8; mBlueBits  = 8;
