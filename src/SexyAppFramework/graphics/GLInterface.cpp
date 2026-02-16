@@ -17,6 +17,10 @@
 
 #define MAX_VERTICES 16384
 
+#ifndef GL_FRAMEBUFFER_SRGB
+#define GL_FRAMEBUFFER_SRGB 0x8DB9 // Not in GLES 2.0 headers, but needed to disable sRGB on Windows.
+#endif
+
 using namespace Sexy;
 
 bool gDesktopGLFallback = false;
@@ -24,8 +28,8 @@ bool gDesktopGLFallback = false;
 static inline uint32_t ArgbToRgba(uint32_t argb) noexcept
 {
 	uint32_t abgr = (argb & 0xFF00FF00u)
-	              | ((argb >> 16) & 0x000000FFu)
-	              | ((argb << 16) & 0x00FF0000u);
+					| ((argb >> 16) & 0x000000FFu)
+					| ((argb << 16) & 0x00FF0000u);
 	return ToLE32(abgr);
 }
 
@@ -33,8 +37,8 @@ static inline uint32_t RgbaToArgb(uint32_t rgba) noexcept
 {
 	uint32_t abgr = FromLE32(rgba);
 	return (abgr & 0xFF00FF00u)
-	     | ((abgr >> 16) & 0x000000FFu)
-	     | ((abgr << 16) & 0x00FF0000u);
+		| ((abgr >> 16) & 0x000000FFu)
+		| ((abgr << 16) & 0x00FF0000u);
 }
 
 static inline uint32_t VertexColor(uint32_t triVertexColor, uint32_t fallback) noexcept
@@ -146,31 +150,32 @@ static void GfxAddVertices(const TriVertex arr[][3], int arrCount, unsigned int 
 }
 
 // Unified GLSL body; VERT_IN / V2F / FRAG_OUT / TEX2D macros from GLPlatform.h.
-static const char *SHADER_CODE =
-"\n V2F vec4 v_color;"
-"\n V2F vec2 v_uv;"
-"\n"
-"\n #ifdef VERTEX"
-"\n     uniform mat4 u_viewProj;"
-"\n     VERT_IN vec3 a_position;"
-"\n     VERT_IN vec4 a_color;"
-"\n     VERT_IN vec2 a_uv;"
-"\n     void main() {"
-"\n         v_color = a_color;"
-"\n         v_uv = a_uv;"
-"\n         gl_Position = u_viewProj * vec4(a_position, 1.0);"
-"\n     }"
-"\n #endif"
-"\n #ifdef FRAGMENT"
-"\n     uniform sampler2D u_texture;"
-"\n     uniform int u_useTexture;"
-"\n     void main() {"
-"\n         if (u_useTexture == 1)"
-"\n             FRAG_OUT = TEX2D(u_texture, v_uv) * v_color;"
-"\n         else"
-"\n             FRAG_OUT = v_color;"
-"\n     }"
-"\n #endif";
+static constexpr const char *SHADER_CODE = R"DELIMITER(
+V2F vec4 v_color;
+V2F vec2 v_uv;
+
+#ifdef VERTEX
+	uniform mat4 u_viewProj;
+	VERT_IN vec3 a_position;
+	VERT_IN vec4 a_color;
+	VERT_IN vec2 a_uv;
+	void main() {
+		v_color = a_color;
+		v_uv = a_uv;
+		gl_Position = u_viewProj * vec4(a_position, 1.0);
+	}
+#endif
+#ifdef FRAGMENT
+	uniform sampler2D u_texture;
+	uniform int u_useTexture;
+	void main() {
+		if (u_useTexture == 1)
+			FRAG_OUT = TEX2D(u_texture, v_uv) * v_color;
+		else
+			FRAG_OUT = v_color;
+	}
+#endif
+)DELIMITER";
 
 static GLuint shaderCompile(const char *src, uint32_t srcLen, GLenum type)
 {
@@ -422,8 +427,6 @@ static void CopyImageToTexturePalette8(MemoryImage *img, int offx, int offy,
 static void CopyImageToTexture(MemoryImage *img, int offx, int offy,
 	int texW, int texH, PixelFormat fmt, bool create)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gLinearFilter ? GL_LINEAR : GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gLinearFilter ? GL_LINEAR : GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -669,13 +672,15 @@ GLuint& TextureData::GetTextureF(float x, float y, float &width, float &height,
 
 static void SetLinearFilter(bool linear)
 {
-	if (gLinearFilter != linear)
-	{
-		int f = linear ? GL_LINEAR : GL_NEAREST;
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
-		gLinearFilter = linear;
-	}
+	gLinearFilter = linear;
+}
+
+static void GfxBindTexture(GLuint tex)
+{
+	glBindTexture(GL_TEXTURE_2D, tex);
+	int f = gLinearFilter ? GL_LINEAR : GL_NEAREST;
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
 }
 
 void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Color& theColor)
@@ -686,7 +691,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 	int srcBottom = srcTop  + theSrcRect.mHeight;
 	if (srcLeft >= srcRight || srcTop >= srcBottom) return;
 
-	uint32_t aColor = ArgbToRgba(theColor.ToInt());
+	uint32_t aColor = theColor.ToGLColor();
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(gUfUseTexture, 1);
 
@@ -711,7 +716,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 				{ x + w, y,     0, aColor, u2, v1 },
 				{ x + w, y + h, 0, aColor, u2, v2 },
 			};
-			glBindTexture(GL_TEXTURE_2D, tex);
+			GfxBindTexture(tex);
 			GfxBegin(GL_TRIANGLE_STRIP);
 			GfxAddVertices(v, 4);
 			GfxEnd();
@@ -835,7 +840,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 		pixelcorrect = 0.0f;
 	}
 
-	uint32_t aColor = ArgbToRgba(theColor.ToInt());
+	uint32_t aColor = theColor.ToGLColor();
 	glActiveTexture(GL_TEXTURE0);
 	glUniform1i(gUfUseTexture, 1);
 
@@ -879,7 +884,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 				{ tp[2].x, tp[2].y, 0, aColor, u2, v1 },
 				{ tp[3].x, tp[3].y, 0, aColor, u2, v2 },
 			};
-			glBindTexture(GL_TEXTURE_2D, tex);
+			GfxBindTexture(tex);
 
 			if (!clipped)
 			{
@@ -908,7 +913,7 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 	{
 		// Single-texture fast path
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mTextures[0].mTexture);
+		GfxBindTexture(mTextures[0].mTexture);
 		glUniform1i(gUfUseTexture, 1);
 
 		GfxBegin(GL_TRIANGLES);
@@ -961,7 +966,7 @@ void TextureData::BltTriangles(const TriVertex theVertices[][3], int theNumTrian
 				DoPolyTextureClip(vl);
 				if (vl.size() >= 3)
 				{
-					glBindTexture(GL_TEXTURE_2D, piece.mTexture);
+					GfxBindTexture(piece.mTexture);
 					GfxBegin(GL_TRIANGLE_FAN);
 					GfxAddVertices(vl);
 					GfxEnd();
@@ -1110,6 +1115,8 @@ int GLInterface::Init(bool IsWindowed)
 	glDisable(GL_DITHER);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
+	glDisable(GL_FRAMEBUFFER_SRGB); // Prevent double gamma correction (already sRGB passthrough)
+	glGetError(); // clear GL_INVALID_ENUM on pure GLES implementations
 
 	mRGBBits   = 32;
 	mRedBits   = 8; mGreenBits = 8; mBlueBits  = 8;
@@ -1145,9 +1152,6 @@ void GLInterface::SetCursorPos(int x, int y)
 
 bool GLInterface::PreDraw()
 {
-	gLinearFilter = false;
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	return true;
 }
@@ -1325,11 +1329,11 @@ void GLInterface::BltTransformed(Image* theImage, const Rect* theClipRect,
 	if (!CreateImageTexture(mem)) return;
 
 	SetDrawMode(theDrawMode);
+	SetLinearFilter(linearFilter);
 	TextureData *data = (TextureData*)mem->mRenderData;
 
 	if (!mTransformStack.empty())
 	{
-		SetLinearFilter(true);
 		if (theX != 0 || theY != 0)
 		{
 			SexyTransform2D t;
@@ -1347,7 +1351,6 @@ void GLInterface::BltTransformed(Image* theImage, const Rect* theClipRect,
 	}
 	else
 	{
-		SetLinearFilter(linearFilter);
 		data->BltTransformed(theTransform, theSrcRect, theColor, theClipRect, theX, theY, center);
 	}
 }
@@ -1368,7 +1371,7 @@ void GLInterface::DrawLine(double x1, double y1, double x2, double y2,
 	}
 
 	glUniform1i(gUfUseTexture, 0);
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	GLVertex v[3] = {
 		{ fx1, fy1, 0, c, 0, 0 },
 		{ fx2, fy2, 0, c, 0, 0 },
@@ -1386,7 +1389,7 @@ void GLInterface::FillRect(const Rect& theRect, const Color& theColor, int theDr
 
 	float x = theRect.mX - 0.5f, y = theRect.mY - 0.5f;
 	float w = theRect.mWidth,     h = theRect.mHeight;
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 
 	GLVertex v[4] = {
 		{ x,     y,     0, c, 0, 0 },
@@ -1418,7 +1421,7 @@ void GLInterface::DrawTriangle(const TriVertex &p1, const TriVertex &p2, const T
 	if (!PreDraw()) return;
 	SetDrawMode(theDrawMode);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	glUniform1i(gUfUseTexture, 0);
 
 	GLVertex v[3] = {
@@ -1449,7 +1452,7 @@ void GLInterface::DrawTrianglesTex(const TriVertex theVertices[][3], int theNumT
 	SetDrawMode(theDrawMode);
 	SetLinearFilter(blend);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	((TextureData*)mem->mRenderData)->BltTriangles(theVertices, theNumTriangles, c, tx, ty);
 }
 
@@ -1479,7 +1482,7 @@ void GLInterface::FillPoly(const Point theVertices[], int theNumVertices,
 	if (!PreDraw()) return;
 	SetDrawMode(theDrawMode);
 
-	uint32_t c = ArgbToRgba(theColor.ToInt());
+	uint32_t c = theColor.ToGLColor();
 	glUniform1i(gUfUseTexture, 0);
 
 	VertexList vl;
