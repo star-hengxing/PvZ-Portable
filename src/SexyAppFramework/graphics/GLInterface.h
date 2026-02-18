@@ -142,8 +142,8 @@ public:
 	void CreateTextureDimensions(MemoryImage *theImage);
 	void CreateTextures(MemoryImage *theImage);
 	void CheckCreateTextures(MemoryImage *theImage);
-	GLuint& GetTexture(int x, int y, int &width, int &height, float &u1, float &v1, float &u2, float &v2);
-	GLuint& GetTextureF(float x, float y, float &width, float &height, float &u1, float &v1, float &u2, float &v2);
+	GLuint& GetTexture(int x, int y, int &width, int &height, float &u1, float &v1, float &u2, float &v2, float *uvBounds);
+	GLuint& GetTextureF(float x, float y, float &width, float &height, float &u1, float &v1, float &u2, float &v2, float *uvBounds);
 
 	void Blt(float theX, float theY, const Rect& theSrcRect, const Color& theColor);
 	void BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrcRect, const Color& theColor, const Rect *theClipRect = nullptr, float theX = 0, float theY = 0, bool center = false);	

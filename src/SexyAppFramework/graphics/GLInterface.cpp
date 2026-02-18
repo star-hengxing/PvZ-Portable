@@ -62,7 +62,14 @@ static int gNumVertices;
 static GLenum gVertexMode;
 static GLuint gProgram;
 static GLuint gVbo;
-static GLint gUfViewProjMtx, gUfTexture, gUfUseTexture;
+static GLint gUfViewProjMtx, gUfTexture, gUfUseTexture, gUfUvBounds;
+static float gUvBounds[4] = {0.f, 0.f, 1.f, 1.f};
+
+static inline void GfxSetUvBounds(const float *uvb)
+{
+	gUvBounds[0] = uvb[0]; gUvBounds[1] = uvb[1];
+	gUvBounds[2] = uvb[2]; gUvBounds[3] = uvb[3];
+}
 
 static void GfxBegin(GLenum vertexMode)
 {
@@ -84,7 +91,11 @@ static void GfxEnd()
 	glVertexAttribPointer(2, 2, GL_FLOAT,         GL_FALSE, sizeof(GLVertex), (const void*)(sizeof(float)*3 + sizeof(uint32_t)));
 	glEnableVertexAttribArray(2);
 
+	glUniform4fv(gUfUvBounds, 1, gUvBounds);
 	glDrawArrays(gVertexMode, 0, gNumVertices);
+
+	gUvBounds[0] = 0.f; gUvBounds[1] = 0.f;
+	gUvBounds[2] = 1.f; gUvBounds[3] = 1.f;
 
 	gVertexMode = (GLenum)-1;
 	gNumVertices = 0;
@@ -168,9 +179,10 @@ V2F vec2 v_uv;
 #ifdef FRAGMENT
 	uniform sampler2D u_texture;
 	uniform int u_useTexture;
+	uniform vec4 u_uvBounds;
 	void main() {
 		if (u_useTexture == 1)
-			FRAG_OUT = TEX2D(u_texture, v_uv) * v_color;
+			FRAG_OUT = TEX2D(u_texture, clamp(v_uv, u_uvBounds.xy, u_uvBounds.zw)) * v_color;
 		else
 			FRAG_OUT = v_color;
 	}
@@ -636,7 +648,8 @@ void TextureData::CheckCreateTextures(MemoryImage *theImage)
 }
 
 GLuint& TextureData::GetTexture(int x, int y, int &width, int &height,
-                                float &u1, float &v1, float &u2, float &v2)
+                                float &u1, float &v1, float &u2, float &v2,
+                                float *uvBounds)
 {
 	int tx = x / mTexPieceWidth, ty = y / mTexPieceHeight;
 	TextureDataPiece &p = mTextures[ty * mTexVecWidth + tx];
@@ -649,11 +662,18 @@ GLuint& TextureData::GetTexture(int x, int y, int &width, int &height,
 
 	u1 = (float)left  / p.mWidth;  v1 = (float)top    / p.mHeight;
 	u2 = (float)right / p.mWidth;  v2 = (float)bottom / p.mHeight;
+
+	// Half-texel inset for shader UV clamping; midpoint fallback guarantees min <= max.
+	float halfU = 0.5f / p.mWidth, halfV = 0.5f / p.mHeight;
+	float midU = (u1 + u2) * 0.5f, midV = (v1 + v2) * 0.5f;
+	uvBounds[0] = std::min(u1 + halfU, midU);  uvBounds[1] = std::min(v1 + halfV, midV);
+	uvBounds[2] = std::max(u2 - halfU, midU);  uvBounds[3] = std::max(v2 - halfV, midV);
 	return p.mTexture;
 }
 
 GLuint& TextureData::GetTextureF(float x, float y, float &width, float &height,
-                                 float &u1, float &v1, float &u2, float &v2)
+                                 float &u1, float &v1, float &u2, float &v2,
+                                 float *uvBounds)
 {
 	int tx = (int)(x / mTexPieceWidth), ty = (int)(y / mTexPieceHeight);
 	TextureDataPiece &p = mTextures[ty * mTexVecWidth + tx];
@@ -667,6 +687,11 @@ GLuint& TextureData::GetTextureF(float x, float y, float &width, float &height,
 
 	u1 = left   / p.mWidth;  v1 = top    / p.mHeight;
 	u2 = right  / p.mWidth;  v2 = bottom / p.mHeight;
+
+	float halfU = 0.5f / p.mWidth, halfV = 0.5f / p.mHeight;
+	float midU = (u1 + u2) * 0.5f, midV = (v1 + v2) * 0.5f;
+	uvBounds[0] = std::min(u1 + halfU, midU);  uvBounds[1] = std::min(v1 + halfV, midV);
+	uvBounds[2] = std::max(u2 - halfU, midU);  uvBounds[3] = std::max(v2 - halfV, midV);
 	return p.mTexture;
 }
 
@@ -699,6 +724,7 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 	float dstX, dstY;
 	int w, h;
 	float u1, v1, u2, v2;
+	float uvb[4];
 
 	srcY = srcTop; dstY = theY;
 	while (srcY < srcBottom)
@@ -707,7 +733,8 @@ void TextureData::Blt(float theX, float theY, const Rect& theSrcRect, const Colo
 		while (srcX < srcRight)
 		{
 			w = srcRight - srcX; h = srcBottom - srcY;
-			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2);
+			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2, uvb);
+			GfxSetUvBounds(uvb);
 			float x = dstX, y = dstY;
 
 			GLVertex v[4] = {
@@ -847,6 +874,7 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 	float dstX, dstY;
 	int w, h;
 	float u1, v1, u2, v2;
+	float uvb[4];
 
 	srcY = srcTop; dstY = starty;
 	while (srcY < srcBottom)
@@ -855,7 +883,8 @@ void TextureData::BltTransformed(const SexyMatrix3 &theTrans, const Rect& theSrc
 		while (srcX < srcRight)
 		{
 			w = srcRight - srcX; h = srcBottom - srcY;
-			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2);
+			GLuint &tex = GetTexture(srcX, srcY, w, h, u1, v1, u2, v2, uvb);
+			GfxSetUvBounds(uvb);
 
 			float x = dstX, y = dstY;
 			SexyVector2 p[4] = { {x, y}, {x, y+h}, {x+w, y}, {x+w, y+h} };
@@ -1083,6 +1112,7 @@ int GLInterface::Init(bool IsWindowed)
 		gUfViewProjMtx = glGetUniformLocation(gProgram, "u_viewProj");
 		gUfTexture     = glGetUniformLocation(gProgram, "u_texture");
 		gUfUseTexture  = glGetUniformLocation(gProgram, "u_useTexture");
+		gUfUvBounds    = glGetUniformLocation(gProgram, "u_uvBounds");
 
 		glGenBuffers(1, &gVbo);
 		glBindBuffer(GL_ARRAY_BUFFER, gVbo);
