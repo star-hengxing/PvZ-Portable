@@ -305,7 +305,7 @@ FILE *fcaseopenat(char const *base, char const *path, char const *mode)
 
     size_t baseLen = strlen(base);
     size_t pathLen = strlen(path);
-    char *full = alloca(baseLen + pathLen + 3);
+    char *full = (char *)alloca(baseLen + pathLen + 3);
     strcpy(full, base);
     size_t fl = strlen(full);
     if (fl > 0 && full[fl - 1] != '/' && full[fl - 1] != '\\')
