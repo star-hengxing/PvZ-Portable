@@ -75,7 +75,7 @@ static void GfxEnd()
 	if (gVertexMode == (GLenum)-1) return;
 
 	glBindBuffer(GL_ARRAY_BUFFER, gVbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLVertex) * gNumVertices, gVertices, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLVertex) * gNumVertices, gVertices);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT,         GL_FALSE, sizeof(GLVertex), (const void*)0);
 	glEnableVertexAttribArray(0);
@@ -101,8 +101,7 @@ static void GfxAddVertices(const GLVertex *arr, int arrCount)
 		GfxBegin(oldMode);
 	}
 
-	for (int i = gNumVertices; i < gNumVertices + arrCount; i++)
-		gVertices[i] = arr[i];
+	memcpy(gVertices + gNumVertices, arr, sizeof(GLVertex) * arrCount);
 	gNumVertices += arrCount;
 }
 
@@ -117,8 +116,7 @@ static void GfxAddVertices(VertexList &arr)
 		GfxBegin(oldMode);
 	}
 
-	for (int i = gNumVertices; i < gNumVertices + arr.size(); i++)
-		gVertices[i] = arr[i];
+	memcpy(gVertices + gNumVertices, arr.mVerts, sizeof(GLVertex) * arr.size());
 	gNumVertices += arr.size();
 }
 
